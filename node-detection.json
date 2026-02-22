@@ -1,0 +1,227 @@
+{
+“$schema”: “https://json-schema.org/draft/2020-12/schema”,
+“$id”: “infrastructure-stability-model/v1.0/node_detection_protocol”,
+“title”: “Latent High-Value Node Detection and Activation Protocol”,
+“description”: “Operational protocol for identifying, validating, and activating suppressed high-skill labor nodes. Signal-based, not credential-based.”,
+“version”: “1.0.0”,
+
+“node_attribute_schema”: {
+“node_id”: { “type”: “string”, “description”: “Anonymous identifier” },
+“R_i”: {
+“type”: “float”,
+“range”: [0.0, 1.0],
+“description”: “Hazard recognition capacity. Measured via behavioral signals, not self-report.”,
+“measurement_proxies”: [
+“anomaly_detection_before_formal_alerts”,
+“pattern_recognition_in_novel_failure_modes”,
+“situational_awareness_in_adjacent_domains”,
+“mentorship_sought_by_peers_in_hazard_situations”,
+“near_miss_reporting_rate_and_quality”
+]
+},
+“A_i”: {
+“type”: “float”,
+“range”: [0.0, 1.0],
+“description”: “Adaptive learning rate. Self-directed skill acquisition across domains.”,
+“measurement_proxies”: [
+“seeks_manuals_outside_job_requirements”,
+“cross_trains_informally_without_incentive”,
+“asks_why_not_just_how”,
+“applies_knowledge_from_unrelated_domains”,
+“mentors_others_spontaneously”
+]
+},
+“L_f_i”: {
+“type”: “float”,
+“range”: [0.0, 1.0],
+“description”: “Baseline labor bandwidth. Physical and cognitive capacity.”,
+“components”: [“experience_depth_years”, “domain_breadth”, “physical_capability”, “cognitive_load_tolerance”]
+},
+“p_engage_i”: {
+“type”: “float”,
+“range”: [0.0, 1.0],
+“description”: “Current estimated engagement probability. Prior over willingness to activate.”,
+“factors”: {
+“reduces_p”: [
+“prior_institutional_rejection”,
+“credential_barrier_experiences”,
+“past_activation_that_led_to_suppression”,
+“high_B_i_in_prior_context”
+],
+“increases_p”: [
+“peer_referral_from_trusted_node”,
+“demonstrated_structural_difference_in_offering”,
+“low_commitment_entry_point”,
+“immediate_tangible_recognition”,
+“decision_authority_commensurate_with_skill”
+]
+},
+“update_rule”: “Bayesian: p_engage updates on demonstrated evidence, not promises. Resistant to broadcast messaging. Responsive to peer vouching and structural legibility.”
+},
+“B_i”: {
+“type”: “float”,
+“range”: [0.0, 1.0],
+“description”: “Current obstruction factor in local context. Must be assessed before activation outreach.”
+},
+“cohort”: {
+“type”: “string”,
+“enum”: [“older_high_R”, “younger_high_A”, “mid_balanced”],
+“description”: “Cohort assignment for deployment optimization.”
+},
+“network_position”: {
+“type”: “object”,
+“properties”: {
+“trust_centrality”: { “type”: “float”, “description”: “Position in peer trust network. High centrality = hub for activation cascade.” },
+“domain_primary”: { “type”: “string” },
+“domains_adjacent”: { “type”: “array”, “items”: { “type”: “string” } },
+“known_latent_adjacents”: { “type”: “integer”, “description”: “Estimated count of connected latent nodes this node can refer.” }
+}
+}
+},
+
+“detection_sequence”: {
+“step_1_environment_targeting”: {
+“description”: “Identify environments with high prior probability of R_i and A_i concentration.”,
+“target_environments”: [
+“electrical_maintenance_high_voltage”,
+“heavy_machinery_operation”,
+“emergency_services_field”,
+“mining_and_extraction”,
+“rural_industrial_facilities”,
+“maritime_and_shipping”,
+“advanced_manufacturing_floor”,
+“agricultural_equipment_systems”
+],
+“rationale”: “Survival-critical environments with continuous improvisation requirements select for high R_i. Credential access is often low in rural/decentralized contexts, creating latent pool.”
+},
+
+```
+"step_2_behavioral_signal_detection": {
+  "description": "Look for behavioral signals, not credentials. These are observable in field context.",
+  "primary_signals": [
+    {
+      "signal": "anomaly_detection_leadership",
+      "description": "Who do coworkers consult when something seems off before formal alerts?",
+      "detection_method": "peer_observation_and_referral"
+    },
+    {
+      "signal": "informal_mentorship_hub",
+      "description": "Who do people ask when they don't know what to do?",
+      "detection_method": "sociometric_mapping_within_workgroup"
+    },
+    {
+      "signal": "self_directed_learning",
+      "description": "Who reads equipment manuals, watches repair videos, or cross-trains without being told to?",
+      "detection_method": "informal_interview_and_observation"
+    },
+    {
+      "signal": "cross_domain_pattern_application",
+      "description": "Who notices that a failure mode in one system resembles a pattern from another domain?",
+      "detection_method": "problem_solving_observation"
+    },
+    {
+      "signal": "conservative_risk_calibration",
+      "description": "Who slows down or stops when something doesn't feel right, even without formal authorization?",
+      "detection_method": "incident_near_miss_review"
+    }
+  ]
+},
+
+"step_3_network_mapping": {
+  "description": "Build local influence graph. Nodes are individuals, edges are trust/referral/mentorship relationships.",
+  "graph_construction": {
+    "node_attributes": ["R_i_estimate", "A_i_estimate", "L_f_i_estimate", "p_engage_estimate", "B_i_estimate"],
+    "edge_types": ["mentorship", "hazard_consultation", "peer_referral", "informal_apprenticeship"],
+    "hub_identification": "Nodes with high in-degree on hazard_consultation edges are high-R_i hubs."
+  },
+  "latent_node_discovery": "Ask active high-R_i nodes: who else do you trust, who's been overlooked, who would you call if something went wrong? Those names are your latent node list."
+},
+
+"step_4_B_i_assessment": {
+  "description": "Before any outreach, assess obstruction level in the node's current context.",
+  "B_i_indicators": [
+    "prior_complaints_about_unrecognized_skill",
+    "history_of_promotion_denial_without_explanation",
+    "coworker_credit_capture_patterns",
+    "management_response_to_informal_expertise"
+  ],
+  "critical_rule": "If B_i_estimate > 0.6 in current context, DO NOT initiate outreach until alternative pathway is established. Activation into high-B_i environment confirms dismissal and permanently reduces p_engage."
+},
+
+"step_5_activation_outreach": {
+  "description": "Contact protocol. Channel and message design are critical. Wrong channel = re-suppression.",
+  "channel_priority": {
+    "first": "trusted_peer_referral_lateral",
+    "second": "community_or_guild_connection",
+    "third": "direct_contact_via_demonstrated_difference",
+    "never": "HR_portal_credential_submission_broadcast_messaging"
+  },
+  "message_structure": {
+    "lead_with": "specific_demonstrated_competence_recognition",
+    "offer": "low_commitment_bounded_demonstration",
+    "avoid": [
+      "vague_promises",
+      "bureaucratic_application_process",
+      "supervised_like_trainee_framing",
+      "long_commitment_before_trust_established"
+    ],
+    "include": "exit_option_control_retained_by_node"
+  },
+  "legibility_conditions": "The offering must be structurally legible as different from prior dismissal BEFORE the node commits. Legibility = competency validation path, compensation signal, decision authority level, bounded entry point."
+},
+
+"step_6_controlled_deployment": {
+  "description": "Initial placement for validation and trust-building.",
+  "placement_priority": "high_kappa_interfaces — where failure cascades are most probable. High-R_i nodes produce maximum stability return when placed at coupling hotspots.",
+  "tracking_metrics": [
+    "hazard_detection_rate",
+    "anomaly_response_time",
+    "adjacent_node_R_i_improvement_rate",
+    "p_engage_trajectory_post_deployment"
+  ],
+  "feedback_loop": "Immediate performance validation raises p_engage and triggers network propagation. Node becomes recruiter/referrer for adjacent latent nodes."
+},
+
+"step_7_iterative_expansion": {
+  "description": "Treat activation as seeded graph traversal, not recruitment campaign.",
+  "expansion_rule": "Each activated node is asked to identify adjacent latent nodes. High trust centrality nodes produce highest referral yield.",
+  "cascade_condition": "If trust network clustering coefficient gamma_t > 0.5 and k_avg > 4, single genuine activation event propagates to 5-15 connected latent nodes within 6-12 months."
+}
+```
+
+},
+
+“cohort_deployment_strategy”: {
+“older_high_R_nodes”: {
+“priority”: 1,
+“deployment”: “immediate_safety_critical_roles_and_high_kappa_interfaces”,
+“secondary_role”: “mentor_hub_for_younger_nodes”,
+“R_i_propagation”: “pair_with_N_younger_nodes_simultaneously”,
+“constraint”: “do_not_supervise_like_trainee — decision_authority_must_match_demonstrated_skill”,
+“temporal_role”: “front_load_system_reliability_during_3_5yr_window”
+},
+“younger_high_A_nodes”: {
+“priority”: 2,
+“deployment”: “paired_with_older_nodes_for_accelerated_ramp”,
+“learning_curve”: “learning_curve(t, mentor_density) — sigmoid with slope proportional to older node contact hours”,
+“cross_domain”: “expose_to_multiple_domains_via_older_node_breadth”,
+“temporal_role”: “long_term_capacity_slope — rises as older nodes retire”
+},
+“temporal_handoff”: {
+“description”: “Critical window where older node contribution declines and younger node ramp has not yet compensated. If gap exists, this is where kappa-amplified cascade concentrates.”,
+“mitigation”: “begin_younger_node_ramp_early_enough_that_curves_cross_before_older_node_retirement_cliff”,
+“monitoring_metric”: “L_f_old(t) + L_f_young(t) must not dip below Phi=0.7 threshold at any point”
+}
+},
+
+“metadata”: {
+“authors”: [“Kavik”, “Claude (Anthropic)”],
+“version”: “1.0.0”,
+“license”: “open”,
+“companion_schemas”: [
+“system_model.json”,
+“intervention_framework.json”,
+“measurement_protocol.json”
+]
+}
+}
