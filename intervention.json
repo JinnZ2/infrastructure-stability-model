@@ -1,0 +1,194 @@
+{
+“$schema”: “https://json-schema.org/draft/2020-12/schema”,
+“$id”: “infrastructure-stability-model/v1.0/measurement_protocol”,
+“title”: “Infrastructure Stability Measurement Protocol”,
+“description”: “Field-deployable metrics for tracking system state. Prioritizes physical and behavioral signals over financial proxies. Addresses management signal lag (tau) by establishing short-latency physical reporting pathways.”,
+“version”: “1.0.0”,
+
+“measurement_philosophy”: {
+“core_problem”: “Financial metrics are a high-pass filter on physical system state. Slow degradation — exactly what precedes nonlinear failure — is invisible until acute. tau_management_lag is not random noise; it is structural.”,
+“solution”: “Establish parallel physical measurement pipeline with direct routing to decision layer. Bypass middle-layer aggregation that strips degradation signal.”,
+“signal_hierarchy”: {
+“tier_1_physical”: “Direct energy, material, labor flow measurements. Fastest time constant. Most accurate.”,
+“tier_2_behavioral”: “Field-observable behaviors: hazard detection rates, anomaly reporting, labor flow patterns.”,
+“tier_3_proxy”: “Financial and administrative metrics. Slowest, most filtered. Do not use as primary stability indicators.”
+}
+},
+
+“phi_measurement”: {
+“description”: “Maintenance burden ratio Phi. Primary stability metric.”,
+“components”: {
+“Em_proxy”: {
+“description”: “Maintenance energy cost proxy”,
+“direct_measures”: [
+“maintenance_labor_hours_per_unit_output”,
+“unplanned_outage_frequency_and_duration”,
+“repair_backlog_queue_depth_and_growth_rate”,
+“mean_time_to_repair_by_system_type”,
+“deferred_maintenance_dollar_value_normalized_to_asset_base”
+]
+},
+“E_proxy”: {
+“description”: “Primary energy throughput proxy”,
+“direct_measures”: [
+“grid_capacity_factor_by_region”,
+“transmission_utilization_rate”,
+“industrial_production_index_sector_adjusted”
+]
+},
+“L_f_active_proxy”: {
+“description”: “Effective labor bandwidth proxy”,
+“direct_measures”: [
+“skilled_trade_vacancy_rate_by_specialty”,
+“average_time_to_fill_critical_maintenance_roles”,
+“retirement_rate_vs_apprenticeship_entry_rate_ratio”,
+“overtime_hours_as_fraction_of_total_skilled_labor_hours”,
+“incident_rate_per_skilled_labor_hour”
+]
+}
+},
+“composite_phi_estimate”: “Phi_proxy = (maintenance_backlog_growth_rate * unplanned_outage_rate) / (capacity_factor * available_skilled_hours)”
+},
+
+“L_f_channel_measurement”: {
+“training_channel”: {
+“metrics”: [
+“apprenticeship_enrollment_and_completion_rates”,
+“time_from_enrollment_to_independent_deployment”,
+“certification_pass_rate_by_credential_type”,
+“new_skilled_worker_output_per_year_by_specialty”
+],
+“time_constant”: “3-7 years — lagging indicator”
+},
+“latent_recovery_channel”: {
+“metrics”: [
+“p_engage_survey_in_target_populations_quarterly”,
+“outreach_response_rate_by_channel_type”,
+“time_from_initial_contact_to_first_deployment”,
+“retention_rate_at_6_12_18_months_post_activation”,
+“referral_rate_activated_nodes_referring_adjacent_nodes”
+],
+“time_constant”: “0.5-2 years — leading indicator if measured correctly”,
+“note”: “Response rate by channel type directly measures outreach_mode effectiveness and signal_fidelity impact. Broadcast channels will show near-zero response in high-R_i target populations.”
+}
+},
+
+“p_engage_measurement”: {
+“description”: “Engagement probability tracking across target populations.”,
+“methods”: {
+“direct”: “Anonymous survey in target communities — willingness to consider re-engagement given specific structural conditions”,
+“behavioral”: “Response rate and quality by outreach channel”,
+“network”: “Referral yield per activated node — measures trust_centrality and cascade_potential”
+},
+“stratification”: “Stratify by: prior_institutional_rejection_history, cohort_age, domain, geographic_region”,
+“warning_signal”: “If p_engage_mean is not rising within 90 days of outreach launch, diagnose: either B_i is still high in target context, or signal_fidelity is insufficient, or channel is wrong. Do not increase outreach volume — diagnose and fix.”
+},
+
+“R_i_measurement”: {
+“description”: “Hazard recognition capacity. Cannot be measured by credential review. Requires behavioral observation.”,
+“field_methods”: {
+“simulation_exercise”: {
+“description”: “Controlled scenario with embedded hazard signals at varying salience levels”,
+“metrics”: [“detection_rate”, “detection_latency”, “false_positive_rate”, “response_quality”],
+“administration”: “Must be administered by field-credible practitioners, not HR or testing services”
+},
+“incident_record_review”: {
+“description”: “Review near-miss reports and anomaly flagging history”,
+“metrics”: [“anomaly_detection_before_formal_alert_rate”, “report_quality_and_actionability”, “cross_domain_pattern_identification”]
+},
+“peer_nomination”: {
+“description”: “Sociometric: who do coworkers consult in hazard situations?”,
+“metrics”: [“nomination_frequency”, “nomination_cross_domain”, “trust_network_centrality”]
+}
+},
+“propagation_tracking”: {
+“description”: “Measure R_i transfer from mentor to mentee nodes over time”,
+“metrics”: [“mentee_R_i_at_baseline_3mo_6mo_12mo”, “mentor_contact_hours_correlation_with_R_i_gain”],
+“expected_pattern”: “sigmoid: slow initial transfer, accelerating through mid-ramp, plateauing near mentor R_i level”
+}
+},
+
+“B_i_measurement”: {
+“description”: “Signal obstruction factor. Requires anonymous or indirect measurement — direct survey in high-B_i contexts produces false negatives.”,
+“methods”: [
+“anonymous_hazard_insight_reporting_rate_vs_formal_channels”,
+“time_from_anomaly_detection_to_management_awareness”,
+“credit_attribution_survey_anonymous”,
+“promotion_outcome_vs_peer_rated_competence_correlation”,
+“voluntary_turnover_rate_of_high_peer_rated_nodes”
+],
+“warning_signal”: “If high_peer_rated_competence nodes are turning over at elevated rates, B_i is high and suppressing them. Investigate credit_capture and incentive_misalignment before launching activation campaigns.”
+},
+
+“kappa_measurement”: {
+“description”: “Coupling coefficient proxy. Measures cascade potential.”,
+“proxies”: [
+“failure_propagation_rate_when_incident_occurs”,
+“mean_recovery_time_from_localized_failure”,
+“regional_interdependency_index_supply_chain_depth”,
+“single_point_of_failure_count_in_critical_infrastructure”,
+“backup_system_coverage_fraction”
+]
+},
+
+“early_warning_dashboard”: {
+“description”: “Minimum viable monitoring set for decision-layer signal pipeline. Short tau target: 30-day lag maximum from field to decision.”,
+“metrics”: [
+{
+“metric”: “maintenance_backlog_growth_rate”,
+“frequency”: “monthly”,
+“warning_threshold”: “positive_for_3_consecutive_months”,
+“alarm_threshold”: “>5pct_monthly_growth”
+},
+{
+“metric”: “skilled_trade_vacancy_rate_critical_specialties”,
+“frequency”: “monthly”,
+“warning_threshold”: “>8pct”,
+“alarm_threshold”: “>15pct”
+},
+{
+“metric”: “unplanned_outage_frequency”,
+“frequency”: “monthly”,
+“warning_threshold”: “rising_trend_3_months”,
+“alarm_threshold”: “>2x_baseline”
+},
+{
+“metric”: “p_engage_in_outreach_target_populations”,
+“frequency”: “quarterly”,
+“warning_threshold”: “not_rising_within_90_days_of_outreach_launch”,
+“alarm_threshold”: “declining”
+},
+{
+“metric”: “high_skill_retirement_rate_vs_apprenticeship_entry_rate”,
+“frequency”: “quarterly”,
+“warning_threshold”: “retirement_rate_exceeds_entry_rate”,
+“alarm_threshold”: “gap_widening_for_2_consecutive_quarters”
+},
+{
+“metric”: “precision_component_backlog_transformers_switchgear”,
+“frequency”: “monthly”,
+“warning_threshold”: “>18_month_lead_time”,
+“alarm_threshold”: “>30_month_lead_time”
+}
+]
+},
+
+“reporting_structure”: {
+“field_to_decision_pipeline”: {
+“description”: “Physical field metrics must route directly to decision layer without middle-layer aggregation that strips degradation signal.”,
+“tau_target_days”: 30,
+“bypass”: “standard_quarterly_financial_reporting_cycle”,
+“format”: “physical_metric_dashboard_separate_from_financial_reporting”
+},
+“false_negative_prevention”: “Physical metrics and financial metrics must be compared explicitly. Divergence between physical degradation signals and positive financial indicators is itself a warning signal — it indicates tau is large and correction will be late.”
+},
+
+“metadata”: {
+“authors”: [“Kavik”, “Claude (Anthropic)”],
+“version”: “1.0.0”,
+“license”: “open”,
+“companion_schemas”: [
+“system_model.json”,
+“node_detection_protocol.json”,
+“intervention_framework.json”
+]
