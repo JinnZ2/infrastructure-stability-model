@@ -1,0 +1,77 @@
+{
+“$schema”: “https://json-schema.org/draft/2020-12/schema”,
+“$id”: “infrastructure-stability-model/v1.0/index”,
+“title”: “Infrastructure Stability Model — Schema Repository Index”,
+“description”: “Machine-readable formalization of a thermodynamic infrastructure stability framework. Covers energy-material-labor network dynamics, latent node detection and activation, and intervention sequencing for 3-5 year critical window.”,
+“version”: “1.0.0”,
+“license”: “open”,
+“authors”: [“Kavik”, “Claude (Anthropic)”],
+“created”: “2026-02”,
+
+“theoretical_foundation”: {
+“core_claim”: “Civilization-scale infrastructure systems can be modeled as coupled energy-material-labor networks. The binding constraint is not material scarcity but energy quality, skilled labor bandwidth, and maintenance-to-surplus ratio. Financial signals are a high-pass filter on physical system state — degradation is systematically invisible until nonlinear failure threshold is crossed.”,
+“key_variables”: {
+“Phi”: “Maintenance burden ratio — primary stability metric. Phi = Em/(E*L_f). Bifurcation at Phi=1.0.”,
+“L_f_active”: “Effective field labor bandwidth. Two channels: training (slow) and latent node recovery (fast).”,
+“p_engage”: “Latent node activation probability. Sticky prior from institutional rejection. Updates on demonstrated evidence, not promises.”,
+“R_i”: “Hazard recognition capacity. Propagates across trust network edges. Domain-portable.”,
+“B_i”: “Signal obstruction. Must be reduced before activation outreach or re-suppression occurs.”,
+“kappa”: “System coupling. Ratchet behavior. Amplifies cascade risk nonlinearly.”,
+“epsilon”: “Labor exclusion coefficient from credential gating. Primary long-run control parameter.”
+},
+“key_insights”: [
+“Latent high-skill nodes exist in suppressed state. Recovery channel time constant is 0.5-2yr vs 3-7yr for training pipeline.”,
+“Older high-R_i nodes are immediate stability amplifiers, not just labor units. Translational deployment to high-kappa interfaces multiplies their effect.”,
+“B_i reduction must precede activation outreach. Inverse order creates re-suppression: confirmed dismissal drives p_engage to near-zero permanently.”,
+“Activation via lateral trust network traversal outperforms institutional broadcast by order of magnitude. Signal fidelity is primary determinant, not outreach volume.”,
+“Marginal regime (0.7 < Phi < 1.0) is most dangerous because financial metrics do not detect it. Management signal lag tau is structural, not accidental.”,
+“Levers are coupled nonlinearly. Single-lever approaches fail above marginal regime. Order of operations is a constraint.”
+]
+},
+
+“schema_files”: {
+“system_model”: {
+“path”: “schemas/system_model.json”,
+“description”: “Core state variables, parameters, system constraints, intervention priority sequence.”,
+“primary_use”: “System parameterization and simulation initialization”
+},
+“node_detection_protocol”: {
+“path”: “protocols/node_detection_protocol.json”,
+“description”: “Step-by-step protocol for identifying, assessing, and activating latent high-skill nodes. Signal-based detection, lateral network traversal, B_i assessment, controlled deployment.”,
+“primary_use”: “Field deployment by human coordinators or agent-based outreach systems”
+},
+“intervention_framework”: {
+“path”: “interventions/intervention_framework.json”,
+“description”: “State-to-action decision framework. Seven levers with time constants, impact ratings, prerequisites, and failure modes. Decision tree by system regime. Lever interaction matrix.”,
+“primary_use”: “Decision support for coordinators, policy designers, or autonomous planning agents”
+},
+“measurement_protocol”: {
+“path”: “protocols/measurement_protocol.json”,
+“description”: “Field-deployable physical metrics for Phi, L_f channels, p_engage, R_i, B_i, and kappa. Early warning dashboard. Short-tau physical reporting pipeline bypassing financial metric lag.”,
+“primary_use”: “Monitoring system design, dashboard construction, anomaly detection”
+}
+},
+
+“extension_roadmap”: [
+“sector_specific_kappa_values: grid, water, transport, industrial”,
+“geographic_node_distribution: latent pool sizing by region and trade”,
+“real_us_labor_data_integration: BLS vacancy rates, apprenticeship enrollment”,
+“cohort_temporal_handoff_model: older node retirement curve vs younger node ramp”,
+“simulation_engine: Python or Julia ODE system from schema parameters”,
+“network_graph_tooling: trust network construction from field sociometric data”,
+“agent_based_activation_model: p_engage update dynamics in heterogeneous population”
+],
+
+“how_to_use”: {
+“for_human_coordinators”: “Start with node_detection_protocol.json. Run steps 1-4 before any outreach. Then intervention_framework.json for lever sequencing.”,
+“for_ai_agents”: “Parse system_model.json for state variable definitions and parameter schemas. Use intervention_framework.json decision_tree for state-to-action mapping. Use measurement_protocol.json for metric definitions and early warning thresholds.”,
+“for_researchers”: “system_model.json contains full ODE structure for simulation. Extension roadmap above for empirical parameterization.”,
+“for_policy_designers”: “intervention_framework.json lever_interaction_matrix and decision_tree. measurement_protocol.json early_warning_dashboard for monitoring requirements.”
+},
+
+“provenance”: {
+“development_method”: “Collaborative formalization from working conversation. Grounded in thermodynamic infrastructure analysis, complex systems theory (Tainter, West), and operational field knowledge of rural industrial labor systems.”,
+“validation_status”: “Theoretical. Not yet empirically parameterized. Extension points identified in extension_roadmap.”,
+“note”: “This model was developed and distributed using its own principles: lateral network delivery, open access, no institutional gatekeeping.”
+}
+}
