@@ -1,0 +1,256 @@
+{
+“$schema”: “https://json-schema.org/draft/2020-12/schema”,
+“$id”: “infrastructure-stability-model/v1.0/system_model”,
+“title”: “Infrastructure Stability System Model”,
+“description”: “Thermodynamic infrastructure stability model: coupled energy-material-labor network with latent node dynamics. Kavik/Claude collaborative formalization v1.0.”,
+“version”: “1.0.0”,
+“model_class”: “coupled_dynamic_system”,
+“time_horizon_years”: [1, 3, 5, 10, 20],
+“critical_window_years”: [3, 5],
+
+“state_variables”: {
+“C”: {
+“symbol”: “C”,
+“name”: “system_complexity”,
+“description”: “Dimensionless index of interdependence depth. Increases with expansion, decreases with maintenance prioritization. Nonlinearly amplifies maintenance energy cost.”,
+“domain”: [0.1, 10.0],
+“units”: “dimensionless”,
+“dynamics”: “dC/dt = a1*Y_bias - a2*S_weight”,
+“coupling”: [“Em”, “beta_eff”],
+“initial_condition_typical”: 1.5,
+“warning_threshold”: 2.5,
+“critical_threshold”: 4.0
+},
+
+```
+"L_f_active": {
+  "symbol": "L_f_active",
+  "name": "effective_field_labor_bandwidth",
+  "description": "Total activated skilled labor bandwidth. Sum of training channel and latent recovery channel. Denominator of maintenance burden ratio Phi.",
+  "domain": [0.01, 5.0],
+  "units": "normalized_labor_hours_per_year",
+  "decomposition": {
+    "L_training": {
+      "description": "Labor from conventional training pipeline. Slow time constant ~3-7 years.",
+      "dynamics": "dL_training/dt = -b1*epsilon - b2*I + b3*T_rate",
+      "time_constant_years": [3, 7]
+    },
+    "L_latent_recovered": {
+      "description": "Labor recovered from suppressed high-skill latent pool. Fast time constant ~0.5-2 years if friction removed.",
+      "formula": "L_latent * p_engage",
+      "time_constant_years": [0.5, 2.0]
+    }
+  },
+  "cohort_decomposition": {
+    "older_nodes": {
+      "L_f_i": "high",
+      "R_i": "high",
+      "A_i": "moderate",
+      "training_lag_years": 0,
+      "p_engage_prior": "low_due_to_dismissal",
+      "deployment_value": "immediate_hazard_stabilization"
+    },
+    "younger_nodes": {
+      "L_f_i": "lower_initial",
+      "R_i": "developing",
+      "A_i": "high",
+      "training_lag_years": [2, 5],
+      "p_engage_prior": "moderate",
+      "deployment_value": "long_term_capacity",
+      "learning_curve_modifier": "learning_curve(t, mentor_density)"
+    }
+  }
+},
+
+"p_engage": {
+  "symbol": "p_engage_i",
+  "name": "node_engagement_probability",
+  "description": "Probability that latent high-skill node i responds to activation outreach. Updated via Bayesian-like prior revision. Key lever: signal fidelity and lateral network delivery.",
+  "domain": [0.0, 1.0],
+  "units": "probability",
+  "dynamics": "dp/dt = signal_eff*(1-p)/prior_dismissal - decay*p*I",
+  "where": {
+    "signal_eff": "sigFidelity * (1 + outreach_mode * gamma_t * k_avg)",
+    "prior_dismissal": "resistance to belief update from past institutional rejection",
+    "decay": "ongoing erosion from inequality pressure I"
+  },
+  "critical_insight": "Activation attempted while B_i (obstruction) is high reduces future p_engage. Re-suppression failure mode. B_i reduction must precede or co-occur with outreach.",
+  "failure_mode": "institutional_theater_suppression",
+  "failure_description": "High PR outreach with low fidelity or broadcast delivery pattern-matches to prior dismissal. Actively decreases p_engage in highest-skill nodes who have strongest pattern recognition for institutional theater."
+},
+
+"R_i": {
+  "symbol": "R_i",
+  "name": "hazard_recognition_capacity",
+  "description": "Per-node hazard detection and systemic awareness. Propagates across mentor-mentee edges. High R_i nodes act as system-wide stability amplifiers independent of domain-specific competence.",
+  "domain": [0.0, 1.0],
+  "units": "dimensionless",
+  "propagation": "R_j(t) += transfer_function(R_i, contact_time, edge_trust)",
+  "deployment_principle": "Place high-R_i nodes at high-kappa interfaces where failure cascades are most probable.",
+  "cross_domain": true,
+  "note": "R_i is domain-portable. An experienced lineman's hazard recognition transfers to adjacent roles. This is translational node deployment."
+},
+
+"A_i": {
+  "symbol": "A_i",
+  "name": "adaptive_learning_rate",
+  "description": "Node capacity for self-directed skill acquisition across domains. High A_i nodes fill competence gaps autonomously, reducing system-level time constants.",
+  "domain": [0.0, 1.0],
+  "units": "dimensionless",
+  "interaction": "High A_i combined with high R_i produces meta-skilled nodes: dynamic stability sensors with adaptive propagation."
+},
+
+"kappa": {
+  "symbol": "kappa",
+  "name": "coupling_coefficient",
+  "description": "Degree of interdependence across regions and sectors. Increases monotonically under efficiency optimization. Has ratchet character: rises easily, decreases only through deliberate redesign or failure-forced restructuring.",
+  "domain": [0.01, 3.0],
+  "units": "dimensionless",
+  "dynamics": "dkappa/dt = c1*optimization_pressure - c2*decentralization_policy",
+  "note": "Ratchet: dkappa/dt is positive under normal optimization. Restoring force requires explicit resilience objective or emergency restructuring.",
+  "interaction_with_beta": "beta_eff = beta0 + gamma*kappa — coupling increases maintenance nonlinearity"
+},
+
+"epsilon": {
+  "symbol": "epsilon",
+  "name": "labor_exclusion_coefficient",
+  "description": "Fraction of potentially available labor excluded by credential gating, certification barriers, or proxy-substitution of competence metrics. Artificially reduces L_f_active.",
+  "domain": [0.0, 0.99],
+  "units": "dimensionless",
+  "formula": "L_effective = L_total * (1 - epsilon)",
+  "levers": ["competency_challenge_exams", "field_simulation_testing", "experience_credit_conversion", "paid_apprenticeship_acceleration"]
+},
+
+"B_i": {
+  "symbol": "B_i",
+  "name": "signal_obstruction_factor",
+  "description": "Suppression of latent node observability and contribution visibility at institutional layer. Sources: management incentive misalignment, coworker credit capture, institutional filtering.",
+  "domain": [0.0, 1.0],
+  "units": "dimensionless",
+  "formula": "L_f_effective = sum(S_i * p_engage_i * O_i * (1 - B_i))",
+  "critical_constraint": "B_i reduction must precede activation outreach. High B_i during activation creates re-suppression: confirmed dismissal experience drives p_engage toward zero permanently.",
+  "reduction_levers": [
+    "direct_performance_measurement_bypassing_hierarchy",
+    "anonymous_decentralized_hazard_reporting",
+    "peer_validated_recognition_networks",
+    "short_feedback_loops_with_immediate_validation"
+  ]
+},
+
+"Phi": {
+  "symbol": "Phi",
+  "name": "maintenance_burden_ratio",
+  "description": "Core stability metric. Ratio of maintenance energy demand to available energy-labor product. System is in surplus below 0.7, marginal 0.7-1.0, structural decay above 1.0.",
+  "formula": "Phi = Em / (E * L_f_active)",
+  "where": {
+    "Em": "alpha * C^beta_eff",
+    "beta_eff": "beta0 + gamma*kappa",
+    "E": "primary energy throughput (normalized)",
+    "L_f_active": "L_training + L_latent*p_engage"
+  },
+  "thresholds": {
+    "stable_surplus": { "range": [0.0, 0.70], "color": "green" },
+    "marginal_high_sensitivity": { "range": [0.70, 1.00], "color": "orange", "note": "Small parameter changes produce large outcome differences. Dangerous because abstraced metrics do not detect." },
+    "structural_decay": { "range": [1.00, 99.0], "color": "red", "note": "System drawing down reserves. Failure synchronization probability rises sharply." }
+  }
+},
+
+"F": {
+  "symbol": "F",
+  "name": "failure_cascade_probability_proxy",
+  "description": "System-level cascade risk. Product of coupling and burden ratio. Nonlinear above threshold.",
+  "formula": "F = kappa * Phi",
+  "thresholds": {
+    "low": 0.5,
+    "marginal": 1.0,
+    "cascade": 1.5
+  }
+}
+```
+
+},
+
+“parameters”: {
+“thermodynamic”: {
+“alpha”: { “description”: “Baseline maintenance energy coefficient”, “typical”: 0.30, “units”: “dimensionless” },
+“beta0”: { “description”: “Base maintenance energy exponent. beta>1 implies nonlinear scaling.”, “typical”: 1.25, “range”: [1.0, 1.8], “empirical_note”: “West scaling work suggests 1.15-1.25 for metabolic systems. Tightly coupled low-redundancy systems: 1.4-1.6.” },
+“gamma”: { “description”: “Coupling-to-beta sensitivity. Higher kappa increases effective maintenance exponent.”, “typical”: 0.30 }
+},
+“labor”: {
+“b1”: { “description”: “Exclusion pressure on labor bandwidth”, “typical”: 0.12 },
+“b2”: { “description”: “Inequality pressure on labor bandwidth”, “typical”: 0.08 },
+“b3”: { “description”: “Training rate input to labor”, “typical”: 0.10 }
+},
+“complexity”: {
+“a1”: { “description”: “Yield-bias driven complexity growth rate”, “typical”: 0.07 },
+“a2”: { “description”: “Stability-weight driven complexity reduction”, “typical”: 0.06 }
+},
+“engagement”: {
+“prior_dismissal”: { “description”: “Resistance coefficient for p_engage update. Encodes accumulated institutional rejection.”, “typical”: 1.2, “range”: [0.3, 2.5], “note”: “Increases with each failed activation attempt. Decreases only via demonstrated structural difference at point of contact.” },
+“gamma_t”: { “description”: “Trust network clustering coefficient. High in tight-knit trade communities.”, “typical”: 0.55 },
+“k_avg”: { “description”: “Average node degree in trust network.”, “typical”: 4.0 },
+“signal_fidelity”: { “description”: “Genuine vs theatrical signal quality. 0=pure broadcast/PR, 1=fully credible demonstrated difference.”, “typical”: 0.20, “critical”: “Primary lever. Low fidelity with high outreach effort actively suppresses high-R_i nodes.” },
+“outreach_mode”: { “description”: “0=institutional broadcast, 1=lateral peer network traversal. Multiplies effective signal by network factor.”, “typical”: 0.20 }
+}
+},
+
+“system_constraints”: {
+“energy_conservation”: “Ep >= Em + En + losses”,
+“labor_conservation”: “L_f_active = L_total*(1-epsilon) - degradation(I) + L_latent*p_engage”,
+“complexity_maintenance_coupling”: “Em = alpha * C^(beta0 + gamma*kappa)”,
+“surplus_condition”: “Innovation requires E_surplus > En_threshold”,
+“cascade_condition”: “Synchronization risk rises sharply when dPhi/dt > 0 for 3+ consecutive periods at Phi > 0.7”
+},
+
+“bifurcation”: {
+“control_parameter”: “Phi”,
+“critical_value”: 1.0,
+“high_sensitivity_region”: [0.7, 1.0],
+“description”: “In high-sensitivity region, small parameter changes produce large outcome differences. This region is dangerous precisely because it does not appear as crisis in abstracted financial metrics. Management signal lag tau filters degradation below quarterly reporting threshold.”,
+“tau_asymmetry”: “Financial signals amplify upside faster than they signal degradation. tau is a high-pass filter on growth signals, low-pass on decay. Slow degradation — exactly the kind that precedes nonlinear failure — is systematically invisible until acute.”
+},
+
+“intervention_priority_sequence”: {
+“note”: “Order of operations matters. These are not independent levers. Phase relationships are constraints.”,
+“phase_1_immediate”: {
+“timeframe_months”: [0, 6],
+“actions”: [
+“reduce_B_i_before_activation_outreach”,
+“identify_latent_nodes_via_lateral_network_traversal”,
+“deploy_older_high_R_i_nodes_to_high_kappa_interfaces”,
+“establish_peer_validated_recognition_channels”
+]
+},
+“phase_2_short”: {
+“timeframe_months”: [6, 18],
+“actions”: [
+“competency_first_validation_replacing_credential_gates”,
+“mentor_pairing_older_to_younger_nodes”,
+“cross_domain_deployment_of_high_R_i_nodes”,
+“short_feedback_loop_activation_reinforcement”
+]
+},
+“phase_3_medium”: {
+“timeframe_months”: [18, 60],
+“actions”: [
+“reduce_kappa_via_regional_decentralization”,
+“slow_net_complexity_growth”,
+“incentive_realignment_at_management_layer”,
+“temporal_handoff_management_old_to_young_cohort”
+]
+}
+},
+
+“metadata”: {
+“authors”: [“Kavik”, “Claude (Anthropic)”],
+“created”: “2026-02”,
+“license”: “open”,
+“repository_note”: “Designed for anonymous open-source hosting. Post to GitHub, share via lateral trust networks matching the model’s own activation principles.”,
+“extension_points”: [
+“parameterize with real U.S. infrastructure data”,
+“add sector-specific kappa values (grid, water, transport)”,
+“add geographic node distribution for translational deployment optimization”,
+“integrate with labor market datasets for latent pool sizing”
+]
+}
+}
