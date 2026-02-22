@@ -1,0 +1,246 @@
+{
+“$schema”: “https://json-schema.org/draft/2020-12/schema”,
+“$id”: “infrastructure-stability-model/v1.0/intervention_framework”,
+“title”: “Infrastructure Stability Intervention Decision Framework”,
+“description”: “State-to-action mapping for infrastructure stabilization. Multi-lever, phase-sequenced. Single-lever approaches fail because B_i, epsilon, L_f_active, and kappa interact nonlinearly.”,
+“version”: “1.0.0”,
+
+“core_principle”: “This is stability management under stress, not optimization to a fixed point. Goal is desynchronization of failure events and maximal system resilience given latent-node constraints. Levers are coupled. Order of operations is a constraint, not a preference.”,
+
+“system_state_assessment”: {
+“inputs_required”: [“Phi”, “C”, “L_f_active”, “kappa”, “epsilon”, “B_i_mean”, “p_engage_mean”, “dPhi_dt”, “time_horizon_years”],
+“regime_classification”: {
+“stable_surplus”: {
+“condition”: “Phi < 0.70”,
+“recommended_mode”: “capacity_building”,
+“urgency”: “low”,
+“primary_levers”: [“latent_node_activation”, “training_pipeline_expansion”, “complexity_managed_growth”]
+},
+“marginal_high_sensitivity”: {
+“condition”: “0.70 <= Phi < 1.00”,
+“recommended_mode”: “stabilization_priority”,
+“urgency”: “high”,
+“note”: “Most dangerous regime. Does not appear as crisis in financial metrics. dPhi/dt is the critical signal.”,
+“primary_levers”: [“immediate_latent_node_activation”, “B_i_reduction_now”, “maintenance_over_expansion”, “kappa_reduction_planning”],
+“time_sensitivity”: “interventions must begin within 6 months or correction cost multiplies”
+},
+“structural_decay”: {
+“condition”: “Phi >= 1.00”,
+“recommended_mode”: “emergency_stabilization”,
+“urgency”: “critical”,
+“primary_levers”: [“all_levers_simultaneously”, “complexity_growth_halt”, “emergency_latent_node_activation”, “kappa_reduction_immediate”],
+“note”: “Single-lever approaches will fail. Coupled multi-lever deployment required.”
+}
+}
+},
+
+“levers”: {
+“L1”: {
+“id”: “L1”,
+“name”: “latent_node_activation”,
+“description”: “Identify and activate suppressed high-skill nodes via lateral network traversal and competency-first validation.”,
+“impact”: “very_high”,
+“time_to_effect_months”: [2, 8],
+“time_constant”: “fast”,
+“prerequisite”: “L4_B_i_reduction”,
+“prerequisite_note”: “B_i reduction must precede or co-occur. Activating into high-B_i environment creates re-suppression and permanently reduces p_engage.”,
+“sub_levers”: {
+“L1a”: “peer_network_traversal_from_trusted_hub_nodes”,
+“L1b”: “competency_demonstration_replacing_credential_submission”,
+“L1c”: “low_commitment_bounded_entry_points”,
+“L1d”: “decision_authority_commensurate_with_skill_level”,
+“L1e”: “immediate_tangible_recognition_and_compensation_signal”
+},
+“failure_modes”: [
+“broadcast_outreach_pattern_matches_to_prior_dismissal”,
+“bureaucratic_application_process_selects_against_target_nodes”,
+“supervised_trainee_framing_insults_experienced_nodes”,
+“promises_without_structural_evidence_read_as_theater”
+],
+“effect_on_model”: “increases L_f_active via L_latent*p_engage channel — fast time constant relative to training pipeline”
+},
+
+```
+"L2": {
+  "id": "L2",
+  "name": "older_node_priority_deployment",
+  "description": "Front-load older high-R_i, high-L_f nodes into safety-critical roles and high-kappa interfaces. Use as hazard amplifiers and mentor hubs.",
+  "impact": "high",
+  "time_to_effect_months": [0, 3],
+  "time_constant": "immediate",
+  "sub_levers": {
+    "L2a": "assign_to_high_kappa_coupling_interfaces",
+    "L2b": "structured_mentor_pairing_with_multiple_younger_nodes",
+    "L2c": "cross_domain_hazard_recognition_transfer",
+    "L2d": "retention_incentives_and_administrative_burden_reduction",
+    "L2e": "safety_oversight_roles_not_pure_physical_load"
+  },
+  "effect_on_model": "immediate L_f_active increase + R_i propagation to adjacent nodes + local kappa_effective reduction at deployment sites",
+  "temporal_note": "Creates temporal handoff window: older node contribution front-loads stability while younger nodes ramp. Monitor L_f_old(t) + L_f_young(t) for gap."
+},
+
+"L3": {
+  "id": "L3",
+  "name": "epsilon_reduction",
+  "description": "Reduce labor exclusion coefficient by replacing credential gates with competency validation pathways.",
+  "impact": "high",
+  "time_to_effect_months": [3, 12],
+  "time_constant": "short",
+  "sub_levers": {
+    "L3a": "competency_challenge_exams_bypassing_degree_requirements",
+    "L3b": "field_simulation_testing_administered_by_credible_field_practitioners",
+    "L3c": "experience_credit_conversion_protocols",
+    "L3d": "paid_apprenticeship_acceleration_tracks",
+    "L3e": "liability_alignment_tied_to_demonstrated_performance_not_credential"
+  },
+  "effect_on_model": "directly reduces epsilon in dL_f/dt equation, increasing L_f_active slope",
+  "bifurcation_note": "Bifurcation diagram shows epsilon is primary control parameter for long-run Phi. Minimum viable fidelity threshold visible in time-to-threshold sweep."
+},
+
+"L4": {
+  "id": "L4",
+  "name": "B_i_reduction",
+  "description": "Reduce signal obstruction factor. Create alternative visibility channels for latent node contributions bypassing local hierarchy suppression.",
+  "impact": "medium_high",
+  "time_to_effect_months": [3, 18],
+  "time_constant": "short_to_medium",
+  "phase_constraint": "MUST PRECEDE L1. This is not a preference. See re-suppression failure mode.",
+  "sub_levers": {
+    "L4a": "direct_task_based_hazard_detection_scoring",
+    "L4b": "anonymous_decentralized_safety_insight_reporting",
+    "L4c": "peer_validated_recognition_independent_of_management",
+    "L4d": "short_feedback_loops_immediate_performance_confirmation",
+    "L4e": "bypass_middle_layer_credit_capture_via_objective_metrics"
+  },
+  "effect_on_model": "increases O_i*(1-B_i) in effective contribution formula, raises p_engage_i by demonstrating structural difference before commitment"
+},
+
+"L5": {
+  "id": "L5",
+  "name": "complexity_growth_throttle",
+  "description": "Temporarily reduce rate of expansion projects relative to maintenance prioritization. Prevents C from outpacing L_f_active recovery.",
+  "impact": "medium",
+  "time_to_effect_months": [0, 6],
+  "time_constant": "immediate_policy_driven",
+  "sub_levers": {
+    "L5a": "maintenance_to_expansion_ratio_mandate",
+    "L5b": "defer_high_complexity_projects_until_Phi_below_0.7",
+    "L5c": "prioritize_optimization_of_existing_systems_over_new_complexity",
+    "L5d": "stockpile_long_lead_precision_components_for_maintenance"
+  },
+  "effect_on_model": "reduces dC/dt, holds beta_eff stable, slows Em growth — buys time for L_f_active recovery",
+  "note": "Not permanent. Once Phi drops below 0.7 and L_f_active trajectory is positive, expansion can resume at controlled rate."
+},
+
+"L6": {
+  "id": "L6",
+  "name": "kappa_reduction",
+  "description": "Reduce system coupling through decentralization. Decreases cascade probability and lowers effective beta_eff.",
+  "impact": "medium",
+  "time_to_effect_months": [12, 36],
+  "time_constant": "medium",
+  "note": "Kappa has ratchet character. Positive restoring force requires deliberate structural redesign, not just operational change.",
+  "sub_levers": {
+    "L6a": "regional_decision_authority_for_hazard_response",
+    "L6b": "distributed_latent_node_placement_in_local_regions",
+    "L6c": "local_mentorship_hubs_reducing_central_dependency",
+    "L6d": "redundancy_preservation_resisting_efficiency_optimization_pressure"
+  },
+  "effect_on_model": "reduces kappa in F=kappa*Phi and in beta_eff=beta0+gamma*kappa — doubly beneficial"
+},
+
+"L7": {
+  "id": "L7",
+  "name": "management_incentive_realignment",
+  "description": "Couple executive compensation to physical infrastructure reliability metrics rather than purely financial yield proxies.",
+  "impact": "medium_low_short_term",
+  "time_to_effect_months": [18, 60],
+  "time_constant": "medium_to_long",
+  "note": "Management ideology shift time constant is 5-15 years. Constraint change is faster than belief change. Focus on structural incentive levers, not persuasion.",
+  "sub_levers": {
+    "L7a": "maintenance_reliability_metrics_in_compensation_structures",
+    "L7b": "insurance_pricing_rewarding_competency_based_training",
+    "L7c": "physical_stress_reporting_tied_to_executive_decision_inputs",
+    "L7d": "short_tau_signal_pipeline_from_field_to_decision_layer"
+  },
+  "effect_on_model": "reduces Y_bias, increases S_weight in dC/dt — slows complexity growth and increases maintenance prioritization over time"
+}
+```
+
+},
+
+“lever_interaction_matrix”: {
+“description”: “Key coupling relationships between levers. Interventions are not independent.”,
+“interactions”: [
+{ “pair”: [“L1”, “L4”], “type”: “prerequisite”, “description”: “L4 must precede L1. Reverse order causes re-suppression.” },
+{ “pair”: [“L2”, “L3”], “type”: “synergistic”, “description”: “Older node deployment creates field-credible validators for L3 competency assessment.” },
+{ “pair”: [“L1”, “L2”], “type”: “synergistic”, “description”: “Older nodes as trusted referrers accelerate L1 lateral network traversal.” },
+{ “pair”: [“L5”, “L1”], “type”: “enabling”, “description”: “Complexity throttle buys time for L1 activation to take effect before Phi crosses threshold.” },
+{ “pair”: [“L6”, “L2”], “type”: “synergistic”, “description”: “Regional decentralization increases value of locally-deployed high-R_i hub nodes.” },
+{ “pair”: [“L3”, “L4”], “type”: “synergistic”, “description”: “Competency validation (L3) works only if results are visible and credited (L4).” }
+]
+},
+
+“decision_tree”: {
+“entry”: “assess_current_Phi”,
+“nodes”: {
+“assess_current_Phi”: {
+“question”: “What is current Phi?”,
+“branches”: {
+“Phi < 0.70”: “stable_capacity_building_mode”,
+“0.70 <= Phi < 1.00”: “marginal_stabilization_mode”,
+“Phi >= 1.00”: “emergency_mode”
+}
+},
+“stable_capacity_building_mode”: {
+“primary_levers”: [“L1”, “L3”],
+“secondary_levers”: [“L2”, “L6”],
+“monitoring”: “track dPhi/dt — if positive and accelerating, escalate to marginal mode before threshold”
+},
+“marginal_stabilization_mode”: {
+“immediate_actions”: [“L4_now”, “L5_now”],
+“short_actions”: [“L1_after_L4_established”, “L2_immediately”],
+“parallel”: [“L3_initiate”, “L6_plan”],
+“critical_check”: “Is B_i assessed and reduction underway before L1 outreach? If not, halt L1 until confirmed.”,
+“monitoring_interval”: “monthly Phi tracking minimum”
+},
+“emergency_mode”: {
+“all_levers”: “simultaneously”,
+“halt”: “new_complexity_expansion”,
+“prioritize”: [“L2_immediate_deployment”, “L4_and_L1_parallel”, “L5_hard_stop_on_expansion”],
+“note”: “Single-lever approaches will fail. Coupled deployment required. Accept that some levers will be imperfect — imperfect simultaneous action outperforms perfect sequential action at Phi > 1.0.”
+}
+}
+},
+
+“monitoring_protocol”: {
+“frequency”: {
+“Phi”: “monthly”,
+“dPhi_dt”: “monthly”,
+“L_f_active_by_channel”: “quarterly”,
+“p_engage_cohort_mean”: “quarterly”,
+“kappa_proxy_metrics”: “biannual”,
+“B_i_field_survey”: “biannual”
+},
+“early_warning_signals”: [
+“Phi_rising_3_consecutive_months”,
+“L_f_training_channel_declining”,
+“p_engage_not_rising_after_outreach_launched”,
+“high_skill_retirement_rate_exceeding_replacement”,
+“transformer_or_precision_component_backlog_growing”,
+“skilled_trade_vacancy_rate_above_10pct”
+],
+“false_negative_risk”: “Financial metrics will not show marginal regime until late. Physical field metrics and labor flow metrics required. tau_management_lag is high-pass filter on decay signal.”
+},
+
+“metadata”: {
+“authors”: [“Kavik”, “Claude (Anthropic)”],
+“version”: “1.0.0”,
+“license”: “open”,
+“companion_schemas”: [
+“system_model.json”,
+“node_detection_protocol.json”,
+“measurement_protocol.json”
+]
+}
+}
