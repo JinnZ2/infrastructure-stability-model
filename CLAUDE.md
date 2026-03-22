@@ -13,9 +13,9 @@ Infrastructure Stability Model — a theoretical systems model for predicting in
 ```
 ├── README.md                 # Project overview and entry point
 ├── LICENSE                   # CC0 1.0 Universal
+├── index.json                # Schema repository index and extension roadmap
 ├── system-model.json         # Core state variables, ODEs, and constraints
-├── decision-framework.json   # State-to-action decision tree by regime
-├── intervention.json         # Seven intervention levers with timing/prerequisites
+├── decision-framework.json   # Seven intervention levers, decision tree, interaction matrix
 ├── measurement.json          # Physical metrics protocol (tier hierarchy)
 ├── node-detection.json       # Node identification via behavioral signal proxies
 └── CLAUDE.md                 # This file
@@ -30,7 +30,7 @@ No subdirectories, no source code, no build system. All content is JSON schema.
 - 0.7 ≤ Φ < 1.0 → marginal (invisible to financial metrics)
 - Φ ≥ 1.0 → structural decay, cascade probable
 
-**File reading order:** README.md → system-model.json → intervention.json → decision-framework.json → node-detection.json → measurement.json
+**File reading order:** README.md → index.json → system-model.json → decision-framework.json → node-detection.json → measurement.json
 
 ## Build / Test / Lint
 
@@ -59,7 +59,10 @@ Each JSON file follows this structure:
 ## When Modifying This Repository
 
 - Keep all content in JSON schema format at the root level
+- Use standard ASCII double quotes (`"`) — never Unicode smart quotes
+- Validate JSON with `python3 -c "import json; json.load(open('file.json'))"` before committing
 - Maintain semantic consistency of parameter names across files
+- Update `companion_schemas` arrays and `index.json` paths when adding/renaming files
 - Preserve the measurement tier hierarchy: tier-1 physical > tier-2 behavioral > tier-3 financial
 - Signal obstruction (Bi) must be reduced before activation outreach in any intervention sequencing
 - Reference Tainter, West, and complex systems cascade theory where applicable
