@@ -50,15 +50,12 @@ Signal obstruction (B_i) must be reduced *before* activation outreach begins. If
 ## What’s in this repo
 
 ```
-infra-stability-model/
-├── index.json                          ← full model overview, extension roadmap
-├── schemas/
-│   └── system_model.json              ← state variables, ODEs, parameters, constraints
-├── protocols/
-│   ├── node_detection_protocol.json   ← 7-step latent node identification and activation
-│   └── measurement_protocol.json      ← physical metrics, early warning thresholds
-└── interventions/
-    └── intervention_framework.json    ← 7 levers, decision tree, interaction matrix
+infrastructure-stability-model/
+├── index.json                 ← full model overview, extension roadmap
+├── system-model.json          ← state variables, ODEs, parameters, constraints
+├── node-detection.json        ← 7-step latent node identification and activation
+├── measurement.json           ← physical metrics, early warning thresholds
+└── decision-framework.json    ← 7 levers, decision tree, interaction matrix
 ```
 
 All schemas are JSON, versioned, and structured for machine ingestion. The ODE system in `system_model.json` is directly translatable to Python or Julia. The decision tree in `intervention_framework.json` maps system state to action sequence.
