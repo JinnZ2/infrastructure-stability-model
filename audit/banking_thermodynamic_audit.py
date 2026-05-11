@@ -209,7 +209,14 @@ class SystemicConstraint:
     """
     Banking requires growth: interest must be serviced from future
     energy / value. If aggregate net energy is contracting, debts
-    cannot be serviced at scale. Model the constraint.
+    cannot be serviced at scale.
+
+    Standard debt dynamics: debt-to-GDP drifts by approximately
+    (r - g) * d per year, where r is the nominal interest rate, g
+    is real GDP growth (or net energy growth as a thermodynamic
+    proxy), and d is the debt-to-GDP ratio. Assumes no primary
+    surplus. The condition for debt-to-GDP to remain stable is
+    g >= r.
     """
 
     current_net_energy_growth_pct: float
@@ -224,32 +231,49 @@ class SystemicConstraint:
 
     def is_debt_serviceable(self) -> Dict[str, object]:
         """
-        First-order check: can interest be serviced from new energy?
+        Compute the per-year drift in debt-to-GDP and classify the
+        regime. drift <= 0 means debt-to-GDP is stable or falling.
         """
-        # Required growth to service interest, in real terms:
-        required_growth = (
-            self.average_interest_rate_pct * self.total_global_debt_to_gdp
-        )
-        # Available: current net energy growth.
-        available_growth = self.current_net_energy_growth_pct
+        r = self.average_interest_rate_pct
+        g = self.current_net_energy_growth_pct
+        d = self.total_global_debt_to_gdp
 
-        gap = required_growth - available_growth
-        serviceable = available_growth >= required_growth
+        # Debt-to-GDP rise, in percentage points per year.
+        # When g >= r, the gap collapses and the debt ratio is
+        # stable or falling (capped at 0 for the "drift" measure).
+        drift = max(0.0, r - g) * d
+        gap_rg = r - g
 
-        if serviceable:
-            verdict = "BANKING SYSTEM SUSTAINABLE under current parameters"
-        elif gap < 5.0:
-            verdict = "BANKING SYSTEM STRESSED -- gap manageable short term"
-        elif gap < 15.0:
-            verdict = "BANKING SYSTEM IN CRISIS -- debt restructuring required"
+        if g >= r:
+            verdict = (
+                "BANKING SYSTEM SUSTAINABLE -- growth meets or "
+                "exceeds the cost of debt; debt-to-GDP stable or falling"
+            )
+        elif drift <= 5.0:
+            verdict = (
+                "BANKING SYSTEM STRESSED -- debt-to-GDP rising slowly "
+                "(<=5 pp/yr); routine primary-surplus policy can offset"
+            )
+        elif drift <= 15.0:
+            verdict = (
+                "BANKING SYSTEM IN CRISIS -- debt-to-GDP rising "
+                "5-15 pp/yr; structural reform or restructuring "
+                "required"
+            )
         else:
-            verdict = "BANKING SYSTEM STRUCTURALLY UNVIABLE at this energy regime"
+            verdict = (
+                "BANKING SYSTEM STRUCTURALLY UNVIABLE at this regime "
+                "-- debt-to-GDP rising >15 pp/yr; compounding without "
+                "available servicing capacity"
+            )
 
         return {
-            "required_growth_pct": required_growth,
-            "available_growth_pct": available_growth,
-            "gap_pct": gap,
-            "serviceable": serviceable,
+            "interest_rate_pct": r,
+            "growth_rate_pct": g,
+            "debt_to_gdp": d,
+            "interest_minus_growth_pct": gap_rg,
+            "debt_drift_pct_per_year": drift,
+            "serviceable": g >= r,
             "verdict": verdict,
         }
 
@@ -525,18 +549,29 @@ def report():
     print("-" * 74)
 
     scenarios = [
-        SystemicConstraint(current_net_energy_growth_pct=+2.0),
-        SystemicConstraint(current_net_energy_growth_pct=0.0),
-        SystemicConstraint(current_net_energy_growth_pct=-1.5),
-        SystemicConstraint(current_net_energy_growth_pct=-5.0),
+        SystemicConstraint(current_net_energy_growth_pct=+8.0,
+                           total_global_debt_to_gdp=3.5),
+        SystemicConstraint(current_net_energy_growth_pct=+3.0,
+                           total_global_debt_to_gdp=1.0),
+        SystemicConstraint(current_net_energy_growth_pct=+5.0,
+                           total_global_debt_to_gdp=3.5),
+        SystemicConstraint(current_net_energy_growth_pct=+3.0,
+                           total_global_debt_to_gdp=3.5),
+        SystemicConstraint(current_net_energy_growth_pct=0.0,
+                           total_global_debt_to_gdp=3.5),
+        SystemicConstraint(current_net_energy_growth_pct=-1.5,
+                           total_global_debt_to_gdp=3.5),
+        SystemicConstraint(current_net_energy_growth_pct=-5.0,
+                           total_global_debt_to_gdp=3.5),
     ]
 
     for s in scenarios:
         v = s.is_debt_serviceable()
-        print(f"  Net energy growth: "
-              f"{s.current_net_energy_growth_pct:+5.1f} %/yr  "
-              f"required: {v['required_growth_pct']:5.1f} %  "
-              f"gap: {v['gap_pct']:+5.1f}  ->  {v['verdict']}")
+        print(f"  g={v['growth_rate_pct']:+5.1f} %/yr  "
+              f"r={v['interest_rate_pct']:4.1f}  "
+              f"d={v['debt_to_gdp']:4.2f}  "
+              f"drift={v['debt_drift_pct_per_year']:+5.2f} pp/yr  "
+              f"->  {v['verdict']}")
     print()
 
     print("LAYER 5: COMPARATIVE CAPITAL COST BY SYSTEM")

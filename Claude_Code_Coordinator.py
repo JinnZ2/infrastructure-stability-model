@@ -49,10 +49,14 @@ REPOS = [
             "-> hydrosphere -> lithosphere -> biosphere."
         ),
         keywords=[
-            "physics", "thermodynamics", "earth systems",
-            "constraint cascade", "regime", "holocene",
-            "differential equations", "climate", "magnetic field",
-            "atmosphere", "hydrology", "biosphere",
+            "physics", "thermodynamics", "thermodynamic",
+            "earth systems", "earth system",
+            "constraint cascade", "regime", "regime change",
+            "holocene", "differential equations", "climate",
+            "magnetic", "magnetic field", "magnetosphere",
+            "ionosphere", "atmosphere", "hydrology", "hydrosphere",
+            "lithosphere", "biosphere", "ecosystem", "carbon",
+            "carbon cycle", "ozone", "ecology",
         ],
         modules=[
             "constraint_cascade",
@@ -72,10 +76,14 @@ REPOS = [
             "quantities."
         ),
         keywords=[
-            "banking", "capital", "debt", "interest", "labor",
-            "workforce", "metrology", "monetary", "value",
-            "convergence", "substrate damage", "epigenetic",
-            "stress", "compounding", "growth",
+            "banking", "bank", "capital", "debt", "interest",
+            "labor", "workforce", "worker", "metrology",
+            "monetary", "money", "currency", "credit",
+            "valuation", "value", "convergence",
+            "substrate damage", "substrate", "epigenetic",
+            "stress", "compounding", "compound", "growth",
+            "wealth", "gdp", "intergenerational",
+            "lubrication", "adaptive labor",
         ],
         modules=[
             "labor_thermodynamics",
@@ -96,10 +104,16 @@ REPOS = [
             "full-cost system comparison."
         ),
         keywords=[
-            "oil", "extraction", "eroi", "refinery", "shale",
-            "well", "decline", "cascade", "supply chain",
-            "gravity battery", "resilience", "energy",
-            "production", "pipeline", "tariff",
+            "oil", "extraction", "extractive", "eroi", "refinery",
+            "shale", "well", "decline", "decline curve",
+            "cascade", "supply chain", "supply", "gravity battery",
+            "gravity rail", "resilience", "resilient", "energy",
+            "production", "pipeline", "tariff", "community",
+            "collapse", "recovery", "redundancy", "fallback",
+            "industrial", "rural", "voluntary", "voluntary labor",
+            "low-capital", "regulation", "regulatory",
+            "scope audit", "audit", "permit", "charter",
+            "infrastructure", "crisis", "emergency",
         ],
         modules=[
             "oil_extraction_thermodynamic_cascade_audit",
@@ -119,23 +133,62 @@ REPOS = [
 
 def find_relevant_modules(query: str) -> List[Dict[str, str]]:
     """
-    Match query keywords against repo and module keywords.
-    Returns list of relevant modules across all repos.
+    Match query keywords against repo and module keywords. Two
+    passes: (1) substring match against repo-level keywords;
+    (2) token overlap between the query and module-name parts
+    (split on underscore). The second pass is a fallback that
+    surfaces modules whose names directly mention query terms
+    even when no repo-level keyword matched.
     """
     query_lower = query.lower()
-    relevant = []
+    # Normalize query into tokens.
+    query_tokens = set(
+        query_lower.replace("?", " ").replace(".", " ")
+        .replace(",", " ").replace("'", "").split()
+    )
 
+    relevant: List[Dict[str, str]] = []
+    seen: set = set()  # (repo, module) dedupe
+
+    # Pass 1: repo-level keyword substring match -> include all
+    # modules in matching repos.
     for repo in REPOS:
         matched_keywords = [
             k for k in repo.keywords if k in query_lower
         ]
         if matched_keywords:
             for module in repo.modules:
+                key = (repo.name, module)
+                if key in seen:
+                    continue
+                seen.add(key)
                 relevant.append({
                     "repo": repo.name,
                     "module": module,
                     "layer": repo.layer,
                     "matched_keywords": matched_keywords,
+                    "matched_module_tokens": [],
+                    "url": (
+                        f"{repo.url}/blob/main/{module}.py"
+                    ),
+                })
+
+    # Pass 2: token overlap with module-name parts.
+    for repo in REPOS:
+        for module in repo.modules:
+            key = (repo.name, module)
+            if key in seen:
+                continue
+            mod_tokens = set(module.lower().split("_"))
+            overlap = sorted(query_tokens & mod_tokens)
+            if overlap:
+                seen.add(key)
+                relevant.append({
+                    "repo": repo.name,
+                    "module": module,
+                    "layer": repo.layer,
+                    "matched_keywords": [],
+                    "matched_module_tokens": overlap,
                     "url": (
                         f"{repo.url}/blob/main/{module}.py"
                     ),
