@@ -18,6 +18,13 @@ Frame:
 
 CC0. stdlib only. Falsifiable: every score has a measurable signal.
 Output is constraint diagnostic, not narrative judgment.
+
+Related modules:
+  - lubrication_work_cascade -- substrate vs comfort labor at the role level
+  - collapse_substrate_mapping -- institutional comfort burn vs substrate work
+  - failure_geometry_analysis -- comfort-designed system failure signatures
+  - banking_thermodynamic_audit -- capital layer as comfort layer
+
 """
 
 from dataclasses import dataclass, field

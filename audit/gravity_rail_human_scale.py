@@ -46,6 +46,13 @@ What it does NOT cover:
   - electric vehicles charged regularly
 
 CC0. Stdlib only.
+
+Related modules:
+  - banking_thermodynamic_audit -- low-capital alternative this module instantiates
+  - shale_well_thermodynamic_reality_module -- high-capital comparator
+  - lubrication_work_cascade -- substrate-coupled labor
+  - timing_as_constraint -- adaptation vs counteraction energy ledger
+
 """
 
 import dataclasses

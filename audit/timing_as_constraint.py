@@ -20,6 +20,13 @@ of observable.
 
 License: CC0
 Stdlib only.
+
+Related modules:
+  - regulatory_scope_audit -- extends scope-conditional framework to regulations
+  - corporate_charter_scope_audit -- scope-conditional corporate charters
+  - audit_authority_scope -- scope-conditional audit authority itself
+  - collapse_substrate_mapping -- permanence as scope failure
+
 """
 
 from dataclasses import dataclass, field

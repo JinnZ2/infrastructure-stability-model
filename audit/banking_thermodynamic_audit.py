@@ -17,6 +17,14 @@ extraction-funded vs. voluntary-labor systems.
 Numbers are order-of-magnitude with sources stated. The point is to
 expose the structure and let anyone replace the inputs with their
 own data. CC0. Standard library only.
+
+Related modules:
+  - eroi_real_time_audit -- loan-level inputs
+  - shale_well_thermodynamic_reality_module -- example project profile
+  - gravity_rail_human_scale -- low-capital alternative comparator
+  - harmonic_drain_audit -- comfort layer concept at the institutional scale
+  - lubrication_work_cascade -- capital extraction vs adaptive labor
+
 """
 
 from dataclasses import dataclass, field

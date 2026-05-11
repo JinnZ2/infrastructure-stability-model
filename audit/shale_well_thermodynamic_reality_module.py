@@ -16,6 +16,13 @@ order-of-magnitude, not precise. The point is to show direction
 of error, not to publish authoritative figures.
 
 CC0. Standard library only.
+
+Related modules:
+  - eroi_real_time_audit -- price-layer adjustment to published EROI
+  - banking_thermodynamic_audit -- capital-layer cost on top of the physical
+  - timing_as_constraint -- temporal scope of well lifespan
+  - failure_geometry_analysis -- extraction-system failure modes
+
 """
 
 from dataclasses import dataclass

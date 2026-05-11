@@ -35,6 +35,14 @@ exits whose crisis-response failure is predictable.
 
 License: CC0
 Stdlib only.
+
+Related modules:
+  - regulatory_scope_audit -- sibling for regulations
+  - audit_authority_scope -- tiered review of charter actions
+  - biological_response_infrastructure -- local response architecture
+  - banking_thermodynamic_audit -- capital-layer cost of corporate operations
+  - collapse_substrate_mapping -- claim-action gap
+
 """
 
 from dataclasses import dataclass, field

@@ -30,6 +30,14 @@ This module:
        institutional permission
 
 CC0. Stdlib only.
+
+Related modules:
+  - lubrication_work_cascade -- mechanism underneath the claim-action gap
+  - regulatory_scope_audit -- scope-audit instrument for the gap
+  - corporate_charter_scope_audit -- same epistemic structure for corporate charters
+  - timing_as_constraint -- institutional permanence assumption
+  - harmonic_drain_audit -- diagnostic at the lexical level
+
 """
 
 from dataclasses import dataclass, field

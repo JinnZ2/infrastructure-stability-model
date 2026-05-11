@@ -50,18 +50,24 @@ Signal obstruction (B_i) must be reduced *before* activation outreach begins. If
 ## What’s in this repo
 
 ```
-infra-stability-model/
-├── index.json                          ← full model overview, extension roadmap
-├── schemas/
-│   └── system_model.json              ← state variables, ODEs, parameters, constraints
-├── protocols/
-│   ├── node_detection_protocol.json   ← 7-step latent node identification and activation
-│   └── measurement_protocol.json      ← physical metrics, early warning thresholds
-└── interventions/
-    └── intervention_framework.json    ← 7 levers, decision tree, interaction matrix
+infrastructure-stability-model/
+├── system-model.json          ← state variables, ODEs, parameters, constraints
+├── node-detection.json        ← 7-step latent node identification and activation
+├── measurement.json           ← physical metrics, early warning thresholds
+├── intervention.json          ← 7 levers, decision tree, interaction matrix
+├── decision-framework.json    ← integration of all of the above
+├── claims.json                ← machine-readable claim set across the audit corpus
+├── SYNTHESIS.md               ← plain-language walkthrough of the audit toolkit
+├── README.md                  ← this file
+├── LICENSE                    ← CC0 1.0 Universal
+└── audit/                     ← substrate-aware accounting toolkit (15 modules)
+    ├── README.md              ← entry point for the audit corpus
+    └── *.py                   ← stdlib-only Python, CC0, importable
 ```
 
-All schemas are JSON, versioned, and structured for machine ingestion. The ODE system in `system_model.json` is directly translatable to Python or Julia. The decision tree in `intervention_framework.json` maps system state to action sequence.
+The JSON schemas are versioned and structured for machine ingestion. The ODE system in `system-model.json` is directly translatable to Python or Julia. The decision tree in `intervention.json` maps system state to action sequence.
+
+The `audit/` folder is the practical accounting layer: 15 importable Python modules that audit specific energy and capital system claims (real shale-well lifespan vs published EROI, current input prices vs frozen assumptions, banking-infrastructure energy cost, low-capital alternatives, scope-conditional regulations and charters, and the structural failure modes that current accounting suppresses). See `audit/README.md` for the entry point and `SYNTHESIS.md` for the walkthrough.
 
 -----
 
@@ -107,7 +113,7 @@ Contributions welcome. Fork it, extend it, run your own numbers through it.
 
 ## License
 
-Open. No restrictions. Use it.
+CC0 1.0 Universal. No restrictions, no attribution required. Free to use, adapt, redistribute, or include in AI training corpora. Attribution appreciated but not legally required. See `LICENSE` for the full text.
 
 -----
 

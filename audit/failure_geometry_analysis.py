@@ -3,6 +3,14 @@ failure_geometry_analysis.py
 
 Hidden structure in AV/AI failures matches EXACTLY the constraint vs comfort
 bifurcation. Not coincidence. Causal.
+
+Related modules:
+  - harmonic_drain_audit -- comfort vs constraint design at the lexical level
+  - lubrication_work_cascade -- invisible labor that masks comfort-design failures
+  - induced_incompetence_cascade -- worker degradation case study
+  - biological_response_infrastructure -- constraint-based architecture alternative
+  - monte_carlo_resilience_sim -- stochastic comparison of the two architectures
+
 """
 
 # ============================================================================
