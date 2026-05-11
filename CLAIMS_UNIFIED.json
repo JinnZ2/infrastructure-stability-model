@@ -1,0 +1,139 @@
+{
+  "corpus_version": "0.1.0",
+  "license": "CC0",
+  "last_updated": "2026-05-11",
+  "description": "Unified falsifiable claims across the three substrate-aware accounting repositories. Each claim has a statement, falsifier, confirmer, confidence level, and source module.",
+  "confidence_levels": {
+    "high": "multiple independent lines of evidence",
+    "moderate": "converging but partial evidence",
+    "low": "plausible mechanism, limited direct data"
+  },
+  "claims": [
+    {
+      "id": "P1_holocene_regime_baseline_drift",
+      "repo": "earth-systems-physics",
+      "module": "assumption_validator",
+      "statement": "Earth-systems equations used in current modeling are Holocene-regime approximations. Several regimes are showing measurable drift outside Holocene bounds.",
+      "falsifier": "Earth-system measurements remain inside Holocene variance bounds for the relevant regimes.",
+      "confirmer": "Documented drift in carbon, hydrology, magnetic, and biological regimes outside Holocene bounds.",
+      "confidence": "high"
+    },
+    {
+      "id": "P2_constraint_cascade_thermodynamic",
+      "repo": "earth-systems-physics",
+      "module": "constraint_cascade",
+      "statement": "Earth physics layers cascade in a defined sequence: electromagnetic base -> magnetosphere -> ionosphere -> atmosphere -> hydrosphere -> lithosphere -> biosphere. Failures propagate downward.",
+      "falsifier": "Documented failure mode that propagates against the cascade direction.",
+      "confirmer": "Coupled differential equation analysis consistent with observed cascade direction.",
+      "confidence": "high"
+    },
+    {
+      "id": "M1_substrate_audit_metrology",
+      "repo": "mathematics-economy",
+      "module": "substrate_audit",
+      "statement": "Monetary units used as training data and economic inputs have never been validated against physical quantities. This is a metrology failure upstream of every model that uses them.",
+      "falsifier": "Documentation that monetary units are physical-quantity validated.",
+      "confirmer": "No published metrology audit grounds dollar units in joules, kilograms, or any physical base unit.",
+      "confidence": "high"
+    },
+    {
+      "id": "M2_labor_thermodynamics_mighty_atom_archetype",
+      "repo": "mathematics-economy",
+      "module": "labor_thermodynamics",
+      "statement": "Industrial workforce measurement systems systematically undervalue load-bearing capacity. Workers scoring ~0.25 on certification signal frequently score ~0.90 on actual operational capacity.",
+      "falsifier": "Comprehensive operational-capacity audit shows certification signal correlates with actual capacity at r > 0.8 across industrial workforces.",
+      "confirmer": "Documented case studies of high-capacity, low-certification workers across multiple industries.",
+      "confidence": "moderate"
+    },
+    {
+      "id": "M3_value_convergence_cooperative_attractor",
+      "repo": "mathematics-economy",
+      "module": "value_convergence_audit",
+      "statement": "AI systems trained on math, physics, and biology substrates independently converge on a cooperative attractor, not a competitive one. This is a stronger natural experiment than published studies suggest.",
+      "falsifier": "Independent training runs on diverse substrate data produce a competitive rather than cooperative attractor.",
+      "confirmer": "Documented convergence across multiple independent training substrates on similar cooperative patterns.",
+      "confidence": "moderate"
+    },
+    {
+      "id": "M4_banking_energy_per_dollar",
+      "repo": "mathematics-economy",
+      "module": "banking_thermodynamic_audit",
+      "statement": "Banking infrastructure energy cost per dollar of capital under management is measurable and non-zero, in the range 5-15 kJ per dollar per year.",
+      "falsifier": "Comprehensive bottom-up accounting yields per-dollar energy cost below 1 kJ per year.",
+      "confirmer": "Global finance sector electricity 200-400 TWh annually against capital base ~$400T yields values in the cited range.",
+      "confidence": "moderate"
+    },
+    {
+      "id": "M5_banking_requires_growth",
+      "repo": "mathematics-economy",
+      "module": "banking_thermodynamic_audit",
+      "statement": "Compounding interest at scale requires aggregate real growth to remain serviceable. Under sustained net energy contraction, the banking system cannot maintain current scale or complexity.",
+      "falsifier": "Historical example of a debt-financed economy sustaining current banking complexity through sustained negative net energy growth without restructuring.",
+      "confirmer": "Documented banking crises in every resource-contraction case study.",
+      "confidence": "high"
+    },
+    {
+      "id": "M6_substrate_damage_intergenerational",
+      "repo": "mathematics-economy",
+      "module": "substrate_damage_audit",
+      "statement": "Chronic institutional stress alters substrate (epigenetic, endocrine, immune) in measurable ways that confound downstream behavioral and psychological measurement and accumulate across generations.",
+      "falsifier": "Stress markers do not normalize across generations when stressors are removed.",
+      "confirmer": "Amedor and Giussani 2026 (Cambridge): physiological mechanisms of socio-environmental stress on pregnancy outcomes.",
+      "confidence": "high"
+    },
+    {
+      "id": "I1_published_eroi_omits_system_costs",
+      "repo": "infrastructure",
+      "module": "oil_extraction_thermodynamic_cascade_audit",
+      "statement": "Published EROI figures for unconventional oil omit at least ten distinct cost vectors. They describe well-site thermodynamics, not delivered-fuel thermodynamics.",
+      "falsifier": "Peer-reviewed EROI calculation explicitly accounting for the ten vectors yields published-range numbers.",
+      "confirmer": "Re-calculation including any subset of the ten vectors yields systematically lower numbers.",
+      "confidence": "high"
+    },
+    {
+      "id": "I2_shale_real_lifespan_6_to_7_years",
+      "repo": "infrastructure",
+      "module": "shale_well_thermodynamic_reality_module",
+      "statement": "Unconventional shale wells have economic productive lifespans of 6-7 years, not the 15-20 years assumed in most published EROI studies.",
+      "falsifier": "Production data from large samples of long-life shale wells consistent with 15-20 year economic productive lifespan.",
+      "confirmer": "Documented decline curves across Bakken, Eagle Ford, Permian consistent with 6-7 year economic cutoff.",
+      "confidence": "high"
+    },
+    {
+      "id": "I3_refinery_cascade_under_overcapacity",
+      "repo": "infrastructure",
+      "module": "refinery_stress_cascade_module",
+      "statement": "Refineries operated at sustained 90 percent plus capacity accumulate stress non-linearly. Failure probability compounds across the network as load redistributes from failed units onto remaining units.",
+      "falsifier": "Network failure data showing independent (Poisson) failure distribution rather than clustering.",
+      "confirmer": "April 2026: 10 plus refinery incidents in 60-day window across 7 countries with common root cause of deferred maintenance under sustained over-capacity.",
+      "confidence": "high"
+    },
+    {
+      "id": "I4_published_eroi_studies_obsolete",
+      "repo": "infrastructure",
+      "module": "eroi_real_time_audit",
+      "statement": "Commonly cited shale EROI studies are 6-12 years old. Current 2026 input prices (shipping, labor, rare earths, insurance, carbon compliance) inflate input cost by approximately 1.7-1.9x weighted average.",
+      "falsifier": "Current-period price audit shows input cost inflation below 1.2x for any major component.",
+      "confirmer": "Component-by-component audit of 2018-2020 baseline vs. 2026 conditions yields the cited inflation range.",
+      "confidence": "moderate"
+    },
+    {
+      "id": "I5_gravity_battery_full_cost_advantage",
+      "repo": "infrastructure",
+      "module": "full_cost_energy_comparison",
+      "statement": "On a 12-dimension full-cost ledger including health, cohesion, skill, substrate, and longevity, voluntary-labor gravity-battery systems score substantially higher than oil extraction. Direct-energy EROI is poor; full-system effect is regenerative.",
+      "falsifier": "Comprehensive full-cost audit shows oil extraction scoring higher across the 12 dimensions when externalities are included.",
+      "confirmer": "Per-dimension scoring with order-of-magnitude values yields ~80 point spread in favor of voluntary-labor systems.",
+      "confidence": "moderate"
+    },
+    {
+      "id": "I6_extraction_funded_by_banking_constraint",
+      "repo": "infrastructure_to_mathematics_economy",
+      "module": "(cross-repo synthesis)",
+      "statement": "Continued industrial extraction is sustained by the banking system's need for growth, not by thermodynamic efficiency. Extraction projects with low or negative net EROI continue to receive financing because they service existing debt structures.",
+      "falsifier": "Demonstration that current extraction continues because it is the most energy-efficient pathway, not because the banking system requires the cash flows.",
+      "confirmer": "Documentation of negative-EROI or near-zero extraction projects continuing under bank financing.",
+      "confidence": "moderate"
+    }
+  ]
+}
