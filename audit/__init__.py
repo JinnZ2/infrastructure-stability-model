@@ -57,6 +57,7 @@ from . import lubrication_work_cascade
 from . import monte_carlo_resilience_sim
 from . import regulatory_scope_audit
 from . import shale_well_thermodynamic_reality_module
+from . import spr_operational_degradation_audit
 from . import timing_as_constraint
 
 __all__ = [
@@ -75,6 +76,7 @@ __all__ = [
     "monte_carlo_resilience_sim",
     "regulatory_scope_audit",
     "shale_well_thermodynamic_reality_module",
+    "spr_operational_degradation_audit",
     "timing_as_constraint",
 ]
 
@@ -99,6 +101,7 @@ CLUSTERS = {
         "shale_well_thermodynamic_reality_module",
         "eroi_real_time_audit",
         "energy_cascade_audit",
+        "spr_operational_degradation_audit",
         "banking_thermodynamic_audit",
         "gravity_rail_human_scale",
     ],

@@ -120,6 +120,16 @@ visible parameters you can override.
   blind-spot warning so renewable-electricity gains aren't
   misread as transport-fuel substitution.
 
+- **`spr_operational_degradation_audit.py`** — audits the
+  Strategic Petroleum Reserve against its design envelope.
+  Salt-cavern infrastructure was designed for large 90-day
+  drawdowns at ~4.4 mbpd, ~2 cycles/decade; current use is
+  continuous low-rate exchange releases (~4 cycles/year, no
+  refill). Reports volume status, days-of-import-protection,
+  off-design cycling degradation multiplier, flags, and a
+  graded verdict (adequate / stressed / severe / degraded /
+  critical).
+
 - **`banking_thermodynamic_audit.py`** — estimates the energy cost
   of capital and banking infrastructure that standard EROI treats
   as free. Five layers: banking infrastructure, capital formation,
@@ -238,6 +248,7 @@ question:
 | Who has final audit authority right now? | `audit_authority_scope.py` |
 | What architecture survives this crisis? | `biological_response_infrastructure.py`, `monte_carlo_resilience_sim.py` |
 | Is the oil price signal tracking physical supply or narrative? | `energy_cascade_audit.py` |
+| Is the SPR still functioning as a buffer? | `spr_operational_degradation_audit.py` |
 | Where is this institution actually burning calories? | `harmonic_drain_audit.py` |
 | Why is this sector falling apart while the metrics look fine? | `lubrication_work_cascade.py` |
 | Why does this AV/AI system fail at the edge? | `failure_geometry_analysis.py` |
