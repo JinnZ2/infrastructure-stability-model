@@ -111,6 +111,15 @@ visible parameters you can override.
   insurance, carbon compliance, tariffs); `SupplyConstraint` flags
   items by availability and lead time.
 
+- **`energy_cascade_audit.py`** — maps current energy market
+  signals against seven thermodynamic constraint layers (price
+  signal integrity, EROI substrate, refining capacity, demand
+  destruction, infrastructure funding, renewable displacement,
+  institutional trust) and detects coupling between layer
+  failures. Carries an explicit liquid-fuel-substitution
+  blind-spot warning so renewable-electricity gains aren't
+  misread as transport-fuel substitution.
+
 - **`banking_thermodynamic_audit.py`** — estimates the energy cost
   of capital and banking infrastructure that standard EROI treats
   as free. Five layers: banking infrastructure, capital formation,
@@ -228,6 +237,7 @@ question:
 | Has this corporation honored its operating charter? | `corporate_charter_scope_audit.py` |
 | Who has final audit authority right now? | `audit_authority_scope.py` |
 | What architecture survives this crisis? | `biological_response_infrastructure.py`, `monte_carlo_resilience_sim.py` |
+| Is the oil price signal tracking physical supply or narrative? | `energy_cascade_audit.py` |
 | Where is this institution actually burning calories? | `harmonic_drain_audit.py` |
 | Why is this sector falling apart while the metrics look fine? | `lubrication_work_cascade.py` |
 | Why does this AV/AI system fail at the edge? | `failure_geometry_analysis.py` |

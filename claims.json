@@ -24,6 +24,7 @@
     "monte_carlo_resilience_sim",
     "shale_well_thermodynamic_reality_module",
     "eroi_real_time_audit",
+    "energy_cascade_audit",
     "banking_thermodynamic_audit",
     "gravity_rail_human_scale"
   ],
@@ -456,6 +457,46 @@
       "module": "eroi_real_time_audit",
       "cluster": "Energy/EROI",
       "statement": "Published EROI claims are calibrated to a specific input-price regime. Re-running against current-period spot prices and supply-chain constraints typically cuts published values by 40-50 percent."
+    },
+    {
+      "id": "EC01",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Diesel prices will diverge upward from crude prices through 2026-2027",
+      "mechanism": "Refinery ceiling + middle distillate demand from trucking/ag",
+      "falsifier": "Diesel-crude spread narrows below $15/bbl for 6+ months"
+    },
+    {
+      "id": "EC02",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Demand destruction will appear first in long-haul trucking and small ag",
+      "mechanism": "Lowest EROI users with thinnest margins fail first",
+      "falsifier": "Trucking fleet hours-of-service unchanged through Q4 2026"
+    },
+    {
+      "id": "EC03",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Infrastructure failures (bridges, roads) will visibly accelerate 12-24 months after fuel tax suspension",
+      "mechanism": "Maintenance deferred during funding gap, decay compounds",
+      "falsifier": "Federal Highway Administration condition metrics improve 2026-2028"
+    },
+    {
+      "id": "EC04",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Public will increasingly distrust crude price as scarcity signal",
+      "mechanism": "Repeated narrative-reversal cycles train pattern recognition",
+      "falsifier": "Consumer sentiment surveys show rising trust in oil market data"
+    },
+    {
+      "id": "EC05",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Renewable electricity additions will accelerate but NOT close liquid fuel gap",
+      "mechanism": "Different energy carrier, different infrastructure, different physics",
+      "falsifier": "Diesel demand drops faster than electricity demand growth 2026-2028"
     }
   ]
 }

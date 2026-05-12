@@ -47,6 +47,7 @@ from . import banking_thermodynamic_audit
 from . import biological_response_infrastructure
 from . import collapse_substrate_mapping
 from . import corporate_charter_scope_audit
+from . import energy_cascade_audit
 from . import eroi_real_time_audit
 from . import failure_geometry_analysis
 from . import gravity_rail_human_scale
@@ -64,6 +65,7 @@ __all__ = [
     "biological_response_infrastructure",
     "collapse_substrate_mapping",
     "corporate_charter_scope_audit",
+    "energy_cascade_audit",
     "eroi_real_time_audit",
     "failure_geometry_analysis",
     "gravity_rail_human_scale",
@@ -96,6 +98,7 @@ CLUSTERS = {
     "Energy/EROI": [
         "shale_well_thermodynamic_reality_module",
         "eroi_real_time_audit",
+        "energy_cascade_audit",
         "banking_thermodynamic_audit",
         "gravity_rail_human_scale",
     ],
