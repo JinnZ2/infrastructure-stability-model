@@ -60,6 +60,7 @@ infrastructure-stability-model/
 ├── CLAIMS_UNIFIED.json        ← cross-repo claim set (this repo + earth-systems-physics + mathematics-economy)
 ├── Claude_Code_Coordinator.py ← cross-repo query router; loads CLAIMS_UNIFIED.json
 ├── SYNTHESIS.md               ← plain-language walkthrough of the audit toolkit
+├── CROSS_SUBSTRATE_EXPERIMENT.md  ← meta-document on the priming experiment this corpus is part of
 ├── README.md                  ← this file
 ├── LICENSE                    ← CC0 1.0 Universal
 └── audit/                     ← substrate-aware accounting toolkit (15 modules)
