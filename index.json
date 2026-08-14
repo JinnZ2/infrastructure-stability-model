@@ -1,12 +1,13 @@
 {
 "$schema": "https://json-schema.org/draft/2020-12/schema",
-"$id": "infrastructure-stability-model/v1.0/index",
+"$id": "infrastructure-stability-model/v1.1/index",
 "title": "Infrastructure Stability Model — Schema Repository Index",
-"description": "Machine-readable formalization of a thermodynamic infrastructure stability framework. Covers energy-material-labor network dynamics, latent node detection and activation, and intervention sequencing for 3-5 year critical window.",
-"version": "1.0.0",
-"license": "open",
+"description": "Machine-readable formalization of a thermodynamic infrastructure stability framework. Covers energy-material-labor network dynamics, latent node detection and activation, and intervention sequencing for 3-5 year critical window. Includes runnable simulation engines and a falsification ledger recording which claims have been tested and what the tests did to them.",
+"version": "1.1.0",
+"license": "CC0 1.0 Universal",
 "authors": ["Kavik", "Claude (Anthropic)"],
 "created": "2026-02",
+"last_revised": "2026-08-14",
 
 "theoretical_foundation": {
 "core_claim": "Civilization-scale infrastructure systems can be modeled as coupled energy-material-labor networks. The binding constraint is not material scarcity but energy quality, skilled labor bandwidth, and maintenance-to-surplus ratio. Financial signals are a high-pass filter on physical system state — degradation is systematically invisible until nonlinear failure threshold is crossed.",
@@ -15,21 +16,51 @@
 "L_f_active": "Effective field labor bandwidth. Two channels: training (slow) and latent node recovery (fast).",
 "p_engage": "Latent node activation probability. Sticky prior from institutional rejection. Updates on demonstrated evidence, not promises.",
 "R_i": "Hazard recognition capacity. Propagates across trust network edges. Domain-portable.",
-"B_i": "Signal obstruction. Must be reduced before activation outreach or re-suppression occurs.",
+"B_i": "Signal obstruction. Must be reduced before activation outreach in the same locality, or hub nodes are burned.",
 "kappa": "System coupling. Ratchet behavior. Amplifies cascade risk nonlinearly.",
 "epsilon": "Labor exclusion coefficient from credential gating. Primary long-run control parameter."
 },
 "key_insights": [
-"Latent high-skill nodes exist in suppressed state. Recovery channel time constant is 0.5-2yr vs 3-7yr for training pipeline.",
-"Older high-R_i nodes are immediate stability amplifiers, not just labor units. Translational deployment to high-kappa interfaces multiplies their effect.",
-"B_i reduction must precede activation outreach. Inverse order creates re-suppression: confirmed dismissal drives p_engage to near-zero permanently.",
-"Activation via lateral trust network traversal outperforms institutional broadcast by order of magnitude. Signal fidelity is primary determinant, not outreach volume.",
-"Marginal regime (0.7 < Phi < 1.0) is most dangerous because financial metrics do not detect it. Management signal lag tau is structural, not accidental.",
-"Levers are coupled nonlinearly. Single-lever approaches fail above marginal regime. Order of operations is a constraint."
+{
+"insight": "Latent high-skill nodes exist in suppressed state. Recovery channel time constant is 0.5-2yr vs 3-7yr for training pipeline.",
+"evidence_status": "untested",
+"note": "Time constants are asserted from operational field knowledge, not measured."
+},
+{
+"insight": "Older high-R_i nodes are immediate stability amplifiers, not just labor units. Translational deployment to high-kappa interfaces multiplies their effect.",
+"evidence_status": "untested"
+},
+{
+"insight": "B_i reduction must precede activation outreach in the same locality. The cost of inverse order is topological, not aggregate: hub survival falls from 100% to 30% and inter-community connectivity to 44%, while total labor still improves over no intervention. The system is left connected enough to function and too fragmented to propagate again.",
+"evidence_status": "revised",
+"ledger_entries": ["F-002", "F-003"],
+"superseded_wording": "Inverse order creates re-suppression: confirmed dismissal drives p_engage to near-zero permanently. Most workforce initiatives fail here."
+},
+{
+"insight": "The sequencing constraint is local, not global. Regionally phased rollouts are safe — a region may begin activation while neighbours are still reducing B_i, provided each region's own B_i is down before its own outreach. Cross-boundary signal leakage does no measurable damage below ~4x its assumed intensity.",
+"evidence_status": "confirmed",
+"ledger_entries": ["F-004"],
+"conditional_on": "leak_intensity in sim/network_sim.py, which is chosen rather than measured."
+},
+{
+"insight": "Activation via lateral trust network traversal outperforms institutional broadcast by order of magnitude. Signal fidelity is primary determinant, not outreach volume.",
+"evidence_status": "untested",
+"note": "Encoded as signal_fidelity and outreach_mode parameters in both simulation engines, but the order-of-magnitude ratio is assumed, not derived."
+},
+{
+"insight": "Marginal regime (0.7 < Phi < 1.0) is most dangerous because financial metrics do not detect it. Management signal lag tau is structural, not accidental.",
+"evidence_status": "untested"
+},
+{
+"insight": "Levers are coupled nonlinearly. Single-lever approaches fail above marginal regime. Order of operations is a constraint.",
+"evidence_status": "untested",
+"note": "Partially probed by the four-scenario ODE comparison, but no single-lever sweep has been run."
+}
 ]
 },
 
-"schema_files": {
+"repository_map": {
+"core_schemas": {
 "system_model": {
 "path": "system-model.json",
 "description": "Core state variables, parameters, system constraints, intervention priority sequence.",
@@ -51,27 +82,114 @@
 "primary_use": "Monitoring system design, dashboard construction, anomaly detection"
 }
 },
+"method": {
+"falsification_protocol": {
+"path": "METHOD.md",
+"description": "The hypothesize-run-result-revise-search-rerun loop, the verdict vocabulary, and the rule that falsified artifacts move to legacy/ rather than being deleted or overwritten.",
+"primary_use": "Required reading before modifying any claim in this repository"
+},
+"falsification_ledger": {
+"path": "legacy/ledger.json",
+"description": "Append-only record of every claim that has been tested, the exact test, the numbers, the verdict, the revised claim, and the unknowns the result opened.",
+"primary_use": "Determining what in this model is evidence and what is assertion"
+},
+"validator": {
+"path": "validate.py",
+"description": "Enforces the repository's own rules: JSON parses, no Unicode smart quotes, ledger entries carry every required field and a named unknown, ledger verdicts are in vocabulary, referenced artifacts and repository_map paths exist, and every audit module runs.",
+"invocation": "python3 validate.py [--full]",
+"requires": [],
+"primary_use": "Run before committing any change to a schema or the ledger"
+}
+},
+"simulation": {
+"ode_engine": {
+"path": "sim/sim.py",
+"description": "Mean-field ODE integration of the 5-variable coupled system. Four intervention scenarios, parameter sensitivity sweeps, temporal cohort handoff, stochastic shock Monte Carlo.",
+"invocation": "python3 sim/sim.py [core|sweep|handoff|shocks|all] [--show]",
+"requires": ["numpy", "scipy", "matplotlib"]
+},
+"agent_based_engine": {
+"path": "sim/network_sim.py",
+"description": "Agent-based simulation over a Watts-Strogatz trust network with heterogeneous R_i. Captures what the mean-field model cannot: hub burn, community fragmentation, bridge-node loss, and partial-order regional phasing.",
+"invocation": "python3 sim/network_sim.py [core|community|partial|all] [--show]",
+"requires": ["numpy", "matplotlib"]
+}
+},
+"audit_modules": {
+"path": "audit/",
+"count": 13,
+"description": "Independent, stdlib-only diagnostic modules. Each runs standalone and prints its own report. Not unified behind a shared bus — see ledger F-005.",
+"note": "Several are prose specifications in Python form rather than computation. Verdict for those is 'untested'; they are not evidence."
+},
+"figures": {
+"path": "figures/",
+"description": "Generated output. Reproducible by rerunning the simulation engines; overwritten rather than archived.",
+"regenerate": "python3 sim/sim.py all && python3 sim/network_sim.py all"
+},
+"legacy": {
+"path": "legacy/",
+"description": "Falsified, superseded, and orphaned artifacts. Retained as evidence, paired with ledger entries. Not maintained, not imported by live code, not deleted."
+}
+},
 
 "extension_roadmap": [
-"sector_specific_kappa_values: grid, water, transport, industrial",
-"geographic_node_distribution: latent pool sizing by region and trade",
-"real_us_labor_data_integration: BLS vacancy rates, apprenticeship enrollment",
-"cohort_temporal_handoff_model: older node retirement curve vs younger node ramp",
-"simulation_engine: Python or Julia ODE system from schema parameters",
-"network_graph_tooling: trust network construction from field sociometric data",
-"agent_based_activation_model: p_engage update dynamics in heterogeneous population"
+{
+"item": "simulation_engine: Python or Julia ODE system from schema parameters",
+"status": "delivered",
+"artifact": "sim/sim.py"
+},
+{
+"item": "agent_based_activation_model: p_engage update dynamics in heterogeneous population",
+"status": "delivered",
+"artifact": "sim/network_sim.py"
+},
+{
+"item": "cohort_temporal_handoff_model: older node retirement curve vs younger node ramp",
+"status": "delivered",
+"artifact": "sim/sim.py handoff"
+},
+{
+"item": "network_graph_tooling: trust network construction from field sociometric data",
+"status": "partial",
+"artifact": "sim/network_sim.py build_trust_network, build_community_network",
+"gap": "Networks are synthetic (Watts-Strogatz, planted communities). No field sociometric data has been ingested. Ledger F-003 names this as the highest-value open unknown."
+},
+{
+"item": "geographic_node_distribution: latent pool sizing by region and trade",
+"status": "partial",
+"artifact": "sim/network_sim.py community and partial-order analyses",
+"gap": "Communities are synthetic and equally sized. No regional or trade-specific pool sizing."
+},
+{
+"item": "sector_specific_kappa_values: grid, water, transport, industrial",
+"status": "pending"
+},
+{
+"item": "real_us_labor_data_integration: BLS vacancy rates, apprenticeship enrollment",
+"status": "pending"
+},
+{
+"item": "second_campaign_simulation: intervention run through a hub-depleted network",
+"status": "pending",
+"rationale": "Ledger F-003 locates the cost of wrong-order activation in the difficulty of the next campaign. That cost has never been simulated."
+},
+{
+"item": "empirical_bound_on_leak_intensity",
+"status": "pending",
+"rationale": "Ledger F-004's partial-order safety result is conditional on this parameter."
+}
 ],
 
 "how_to_use": {
-"for_human_coordinators": "Start with node_detection_protocol.json. Run steps 1-4 before any outreach. Then intervention_framework.json for lever sequencing.",
-"for_ai_agents": "Parse system_model.json for state variable definitions and parameter schemas. Use intervention_framework.json decision_tree for state-to-action mapping. Use measurement_protocol.json for metric definitions and early warning thresholds.",
-"for_researchers": "system_model.json contains full ODE structure for simulation. Extension roadmap above for empirical parameterization.",
-"for_policy_designers": "intervention_framework.json lever_interaction_matrix and decision_tree. measurement_protocol.json early_warning_dashboard for monitoring requirements."
+"for_human_coordinators": "Start with node-detection.json. Run steps 1-4 before any outreach. Then decision-framework.json for lever sequencing. Check legacy/ledger.json for which of the claims you are relying on have actually been tested.",
+"for_ai_agents": "Parse system-model.json for state variable definitions and parameter schemas. Use the decision_tree in decision-framework.json for state-to-action mapping. Use measurement.json for metric definitions and early warning thresholds. Read legacy/ledger.json before treating any key_insight as established — evidence_status fields distinguish confirmed from asserted.",
+"for_researchers": "system-model.json contains the full ODE structure; sim/sim.py implements it. The open unknowns most worth attacking are listed in legacy/ledger.json under open_unknowns_summary.",
+"for_policy_designers": "decision-framework.json lever_interaction_matrix and decision_tree. measurement.json early_warning_dashboard for monitoring requirements. Note that the sequencing constraint has been narrowed — see ledger F-002 through F-004 before designing around it."
 },
 
 "provenance": {
 "development_method": "Collaborative formalization from working conversation. Grounded in thermodynamic infrastructure analysis, complex systems theory (Tainter, West), and operational field knowledge of rural industrial labor systems.",
-"validation_status": "Theoretical. Not yet empirically parameterized. Extension points identified in extension_roadmap.",
+"validation_status": "Structurally simulated, empirically unparameterized. The ODE and agent-based models run and their results are recorded in legacy/ledger.json. No parameter in either model has been calibrated against field data. Two model claims have been falsified and revised by their own simulations; one has been confirmed against a strengthened test.",
 "note": "This model was developed and distributed using its own principles: lateral network delivery, open access, no institutional gatekeeping."
 }
 }

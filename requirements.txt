@@ -1,0 +1,6 @@
+# Simulation engines in sim/ only.
+# Everything in audit/ is standard library and needs none of this.
+
+numpy
+scipy          # sim/sim.py only (solve_ivp)
+matplotlib

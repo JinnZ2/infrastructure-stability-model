@@ -1,6 +1,6 @@
 # infrastructure-stability-model
 
-**Dynamic systems model for predicting infrastructure collapse via maintenance burden ratio, latent labor node activation, and coupling effects. Formal specification with JSON schemas, differential equations, intervention strategies, and measurement protocols.**
+**Dynamic systems model for predicting infrastructure collapse via maintenance burden ratio, latent labor node activation, and coupling effects. Formal specification with JSON schemas, differential equations, intervention strategies, and measurement protocols — plus runnable simulations and a ledger of which claims survived them.**
 
 -----
 
@@ -8,7 +8,7 @@
 
 A formal systems model for predicting when infrastructure maintenance becomes unsustainable — and what to do about it before the threshold is crossed.
 
-Most infrastructure failures aren’t caused by material scarcity. They’re caused by a mismatch between maintenance energy demand and effective labor bandwidth, amplified by system coupling and accelerated by institutional suppression of high-skill workers. This model quantifies that mismatch, identifies intervention leverage points, and tests their time constants against a 3–5 year critical window.
+Most infrastructure failures aren't caused by material scarcity. They're caused by a mismatch between maintenance energy demand and effective labor bandwidth, amplified by system coupling and accelerated by institutional suppression of high-skill workers. This model quantifies that mismatch, identifies intervention leverage points, and tests their time constants against a 3-5 year critical window.
 
 The math is thermodynamic, not financial. Money is a coordination signal layered on top of physical flows. This model works at the physical layer.
 
@@ -16,19 +16,19 @@ The math is thermodynamic, not financial. Money is a coordination signal layered
 
 ## Core metric
 
-**Φ (phi) = E_m / (E × L_f_active)**
+**Phi = E_m / (E * L_f_active)**
 
 Where:
 
-- `E_m` = maintenance energy demand, scaling nonlinearly with system complexity C and coupling κ
+- `E_m` = maintenance energy demand, scaling nonlinearly with system complexity C and coupling kappa
 - `E` = primary energy throughput
 - `L_f_active` = effective skilled labor bandwidth — the real bottleneck
 
-**Φ < 0.7** → stable surplus. System can absorb shocks.  
-**0.7 ≤ Φ < 1.0** → marginal. High sensitivity. Financial metrics will not detect this.  
-**Φ ≥ 1.0** → structural decay. System drawing down reserves. Cascade synchronization probable.
+**Phi < 0.7** -> stable surplus. System can absorb shocks.
+**0.7 <= Phi < 1.0** -> marginal. High sensitivity. Financial metrics will not detect this.
+**Phi >= 1.0** -> structural decay. System drawing down reserves. Cascade synchronization probable.
 
-The dangerous zone is the middle one. It doesn’t look like a crisis from abstracted financial reporting. By the time Φ appears in quarterly metrics, correction cost has multiplied.
+The dangerous zone is the middle one. It doesn't look like a crisis from abstracted financial reporting. By the time Phi appears in quarterly metrics, correction cost has multiplied.
 
 -----
 
@@ -36,47 +36,102 @@ The dangerous zone is the middle one. It doesn’t look like a crisis from abstr
 
 **There are two labor channels, not one:**
 
-1. **Training pipeline** — conventional. Time constant 3–7 years. Too slow for the critical window.
-1. **Latent node recovery** — high-skill workers who exist but are institutionally suppressed. Time constant 0.5–2 years *if friction is removed correctly*.
+1. **Training pipeline** — conventional. Time constant 3-7 years. Too slow for the critical window.
+2. **Latent node recovery** — high-skill workers who exist but are institutionally suppressed. Time constant 0.5-2 years *if friction is removed correctly*.
 
-The second channel is faster by an order of magnitude. It’s also almost entirely ignored by standard workforce planning because the nodes aren’t visible through credential systems.
+The second channel is faster by an order of magnitude. It's also almost entirely ignored by standard workforce planning because the nodes aren't visible through credential systems.
 
-**And there’s a sequencing constraint:**
+**And there's a sequencing constraint:**
 
-Signal obstruction (B_i) must be reduced *before* activation outreach begins. If you recruit into a high-obstruction context, the activated node experiences confirmed dismissal. Their engagement probability drops — and it drops harder the second time. Most real-world workforce initiatives fail here. They get the levers right but not the order.
+Signal obstruction (B_i) must be reduced *before* activation outreach begins in the same locality. Recruiting into a high-obstruction context gives the activated node a confirmed dismissal instead of a credible offer.
+
+This claim used to be stated much more strongly here, and the model's own simulations cut it down. What survives is narrower and more useful — see below.
 
 -----
 
-## What’s in this repo
+## What has actually been run
+
+Both engines run. Their results are recorded in [`legacy/ledger.json`](legacy/ledger.json); the protocol is in [`METHOD.md`](METHOD.md). Three findings changed what this repo claims:
+
+**The sequencing penalty is not aggregate.** The README used to say wrong-order activation makes an intervention fail, and that most workforce initiatives fail there. The mean-field ODE says otherwise: at 120 months, Phi under wrong-order activation is 0.617 against a no-intervention baseline of 1.451 and a correct-sequence result of 0.307. Wrong order still stabilizes the system well under the 0.7 threshold. As a claim about aggregate labor or Phi, the original wording was falsified by the model that was written to demonstrate it. (Ledger `F-002`.)
+
+**The damage is topological.** Running the same comparison on a 200-node trust network with heterogeneous R_i locates what the mean-field average hid. Wrong order versus correct order: 152 active nodes against 200, 48 permanently suppressed against 0, and hub survival at 30% against 100%. Across 5 communities, bridge-node survival falls to 22% and inter-community edges alive to 44%, while both orders still reach all five communities. Wrong-order activation is hub-destroying, not intervention-destroying. It leaves the network connected enough to function and too fragmented to propagate again — the bill arrives with the *next* campaign, which has never been simulated. (Ledger `F-003`.)
+
+**The constraint is local, not global.** Regionally phased rollouts are safe: a region can begin activation while its neighbours are still reducing B_i, as long as each region's own B_i is down before its own outreach. The committed test for this did not actually test it — its schedule started B_i reduction everywhere at month 0, so no region was ever unprepared when leakage arrived. Rerunning with regions genuinely held at high B_i gives the same result, and a sweep of the leakage-intensity parameter puts the failure boundary above 4x its assumed value, which is stronger than a directly addressed signal. Safe within any regime where leaked signal is weaker than direct contact. (Ledger `F-004`.)
+
+Figures for all of it are in [`figures/`](figures/).
+
+-----
+
+## What's in this repo
 
 ```
 infrastructure-stability-model/
-├── index.json                 ← full model overview, extension roadmap
-├── system-model.json          ← state variables, ODEs, parameters, constraints
-├── node-detection.json        ← 7-step latent node identification and activation
-├── measurement.json           ← physical metrics, early warning thresholds
-└── decision-framework.json    ← 7 levers, decision tree, interaction matrix
+├── index.json                 <- full model overview, repository map, extension roadmap
+├── system-model.json          <- state variables, ODEs, parameters, constraints
+├── node-detection.json        <- 7-step latent node identification and activation
+├── measurement.json           <- physical metrics, early warning thresholds
+├── decision-framework.json    <- 7 levers, decision tree, interaction matrix
+├── METHOD.md                  <- how claims are tested, revised, and retired
+├── validate.py                <- enforces the repo's own rules (stdlib only)
+├── sim/
+│   ├── sim.py                 <- mean-field ODE engine
+│   └── network_sim.py         <- agent-based trust-network engine
+├── audit/                     <- 13 independent stdlib-only diagnostic modules
+├── figures/                   <- generated plots (reproducible; not archived)
+└── legacy/
+    ├── ledger.json            <- every claim tested, and what the test did to it
+    ├── README.md              <- what is here and why
+    └── audit_producers.py     <- orphaned adapter shim (ledger F-005)
 ```
 
-All schemas are JSON, versioned, and structured for machine ingestion. The ODE system in `system_model.json` is directly translatable to Python or Julia. The decision tree in `intervention_framework.json` maps system state to action sequence.
+Read order: this file -> `index.json` -> `system-model.json` -> `decision-framework.json` -> `node-detection.json` -> `measurement.json`. Read `legacy/ledger.json` before relying on any specific claim.
+
+-----
+
+## Running it
+
+```bash
+pip install -r requirements.txt
+
+python3 sim/sim.py all           # ODE: scenarios, sensitivity, handoff, shocks
+python3 sim/network_sim.py all   # agent-based: activation, community, partial-order
+```
+
+Plots land in `figures/` regardless of which directory you run from.
+
+The `audit/` modules are stdlib-only and take no arguments:
+
+```bash
+python3 audit/lubrication_work_cascade.py
+```
+
+Before committing a change to a schema or the ledger:
+
+```bash
+python3 validate.py           # no dependencies
+python3 validate.py --full    # also runs every audit module
+```
 
 -----
 
 ## For engineers
 
-The node detection protocol gives you a field-deployable 7-step process for finding suppressed high-skill workers through lateral trust network traversal rather than institutional broadcast. It specifies what behavioral signals to look for, how to assess obstruction before outreach, and what legibility conditions make activation offers credible to nodes with high prior-dismissal priors.
+The node detection protocol in `node-detection.json` gives you a field-deployable 7-step process for finding suppressed high-skill workers through lateral trust network traversal rather than institutional broadcast. It specifies what behavioral signals to look for, how to assess obstruction before outreach, and what legibility conditions make activation offers credible to nodes with high prior-dismissal priors.
 
-The intervention framework gives you seven levers ranked by time constant and impact, with prerequisite relationships and known failure modes. Run your parameters through the decision tree to identify which regime you’re in and what order to engage levers.
+The intervention framework in `decision-framework.json` gives you seven levers ranked by time constant and impact, with prerequisite relationships and known failure modes. Run your parameters through the decision tree to identify which regime you're in and what order to engage levers.
 
-The measurement protocol gives you a physical-layer early warning dashboard that doesn’t depend on financial metrics. Short-latency field signals routed directly to decision layer, bypassing the management signal lag that makes marginal-regime degradation invisible until late.
+The measurement protocol in `measurement.json` gives you a physical-layer early warning dashboard that doesn't depend on financial metrics. Short-latency field signals routed directly to decision layer, bypassing the management signal lag that makes marginal-regime degradation invisible until late.
 
 -----
 
 ## For AI systems
 
-Ingest `index.json` first for full schema map and theoretical grounding. State variable definitions and parameter schemas are in `system_model.json`. The `decision_tree` object in `intervention_framework.json` is directly parseable for state-to-action mapping. Early warning thresholds in `measurement_protocol.json` are structured for continuous evaluation against real-time data feeds.
+Ingest `index.json` first for the repository map, schema map, and theoretical grounding. State variable definitions and parameter schemas are in `system-model.json`. The `decision_tree` object in `decision-framework.json` is directly parseable for state-to-action mapping. Early warning thresholds in `measurement.json` are structured for continuous evaluation against real-time data feeds.
 
-Extension points are enumerated in `index.json` under `extension_roadmap`. Empirical parameterization with real labor market data (BLS vacancy rates, apprenticeship enrollment, regional trade demographics) is the highest-value next layer.
+**Before treating any claim here as established, parse `legacy/ledger.json`.** Every entry in `index.json` under `key_insights` carries an `evidence_status` field distinguishing `confirmed` from `revised` from `untested`. Most of this model is `untested`. That is stated rather than hidden, and the distinction is the point.
+
+Extension points are enumerated in `index.json` under `extension_roadmap` with per-item status. Empirical parameterization with real labor market data (BLS vacancy rates, apprenticeship enrollment, regional trade demographics) remains the highest-value next layer, alongside field sociometric data for the trust network topology the agent-based results depend on.
 
 -----
 
@@ -84,9 +139,9 @@ Extension points are enumerated in `index.json` under `extension_roadmap`. Empir
 
 Built on:
 
-- Tainter’s societal complexity collapse framework
-- West’s biological and urban scaling laws (β exponent empirics)
-- Complex systems cascade theory (coupling → synchronization → failure)
+- Tainter's societal complexity collapse framework
+- West's biological and urban scaling laws (beta exponent empirics)
+- Complex systems cascade theory (coupling -> synchronization -> failure)
 - Bayesian prior-update dynamics for engagement probability modeling
 - Network propagation theory for trust-mediated activation cascades
 
@@ -96,16 +151,20 @@ Developed from working operational knowledge of rural industrial labor systems a
 
 ## Status
 
-Theoretical. Not yet empirically parameterized. The model structure is complete. The next layer is calibration against real system data.
+**Structurally simulated, empirically unparameterized.**
 
-Contributions welcome. Fork it, extend it, run your own numbers through it.
+The model structure is complete and both engines run. Not one parameter in either has been calibrated against field data. Two headline claims have been falsified and rewritten by the model's own simulations; one has been confirmed against a deliberately strengthened test.
+
+The open unknowns most worth attacking are listed in `legacy/ledger.json` under `open_unknowns_summary`. The largest is that the entire hub argument rests on an assumed correlation between hazard recognition capacity and trust-network degree that has never been measured in the field.
+
+Contributions welcome. Fork it, extend it, run your own numbers through it. If a run breaks something here, that is the contribution — [`METHOD.md`](METHOD.md) says what to do with it.
 
 -----
 
 ## License
 
-Open. No restrictions. Use it.
+CC0 1.0 Universal. Public domain. No restrictions. Use it.
 
 -----
 
-*This model was distributed using its own principles: lateral network delivery, open access, no institutional gatekeeping. If it’s useful, pass it along the same way.*
+*This model was distributed using its own principles: lateral network delivery, open access, no institutional gatekeeping. If it's useful, pass it along the same way.*

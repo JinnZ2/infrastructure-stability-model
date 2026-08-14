@@ -243,7 +243,7 @@
 "authors": ["Kavik", "Claude (Anthropic)"],
 "created": "2026-02",
 "license": "open",
-"repository_note": "Designed for anonymous open-source hosting. Post to GitHub, share via lateral trust networks matching the model’s own activation principles.",
+"repository_note": "Designed for anonymous open-source hosting. Post to GitHub, share via lateral trust networks matching the model's own activation principles.",
 "extension_points": [
 "parameterize with real U.S. infrastructure data",
 "add sector-specific kappa values (grid, water, transport)",
