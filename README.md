@@ -63,6 +63,51 @@ Figures for all of it are in [`figures/`](figures/).
 
 -----
 
+## Getting from here to there
+
+The seven levers assume an actor already permitted to pull them. Most readers
+are not, and the framework used to have no way of saying so — it ranked levers
+by impact and time constant and never asked whose consent each one needs. That
+was a design defect for the audience this repo claims to be for, and it is
+fixed: every lever now carries an authority tier, and
+`decision-framework.json` has a `transition_layer` describing the governing,
+regulatory, corporate, financial, and labor moves from the incumbent design to
+the target one. (Ledger `F-009`.)
+
+`sim/transition.py` scores each lever as effect over the cost of *being allowed
+to act* — effort, consent required, reversibility, and the time the consent
+campaign itself takes. Three things came out of running it:
+
+**The same three levers win for everybody.** {L1 latent node activation, L2
+older node priority deployment, L4 B_i reduction} occupy the top three for
+every actor archetype from field crew to federal regulator — and the
+regulator's own statutory levers rank last on the regulator's own list. Two of
+the three need no external consent at all. Perturbing every asserted parameter
+independently by ±30% permutes the internal order freely but never breaks the
+set; it first breaks around ±45%. So the honest claim is a set, not a ranking.
+(Ledger `F-010`.)
+
+**But the no-permission path is a bridge, not a destination.** Running the
+emitted plan through the ODE: a crew with no institutional standing doing
+L4 → L1 moves Φ from 1.451 to 0.717 at 120 months, arresting a cascade that
+otherwise crosses 1.0 at month 74. That is most of the available gain, taken
+without asking anyone. It also drifts back through 0.70 at month 116, because
+it adds labor bandwidth and touches neither the complexity ratchet (L5) nor
+coupling (L6) — both tier-2. What tier-0 action buys is the window. The record
+it produces during that window is the argument for the tier-2 ask.
+(Ledger `F-012`.)
+
+**Every substrate transition has the same shape.** Build the parallel channel
+at tier 0, run it until it produces a record, then make the tier-2 or tier-3
+ask using that record as the argument. That is the same structure as the
+B_i-before-activation constraint applied to institutions instead of nodes:
+establish the credible channel before attaching consequence to it, or the
+attempt confirms the prior it was meant to overturn. The load-bearing
+assumption there — that a tier-0 evidence record actually raises the odds of
+the institutional ask succeeding — is untested, and is named as such.
+
+-----
+
 ## What's in this repo
 
 ```
@@ -76,7 +121,8 @@ infrastructure-stability-model/
 ├── validate.py                <- enforces the repo's own rules (stdlib only)
 ├── sim/
 │   ├── sim.py                 <- mean-field ODE engine
-│   └── network_sim.py         <- agent-based trust-network engine
+│   ├── network_sim.py         <- agent-based trust-network engine
+│   └── transition.py          <- incumbent -> target design, by authority tier (stdlib only)
 ├── audit/                     <- 13 independent stdlib-only diagnostic modules
 ├── figures/                   <- generated plots (reproducible; not archived)
 └── legacy/
@@ -99,6 +145,16 @@ python3 sim/network_sim.py all   # agent-based: activation, community, partial-o
 ```
 
 Plots land in `figures/` regardless of which directory you run from.
+
+The transition module needs no dependencies at all — that is deliberate, and
+`validate.py` enforces it:
+
+```bash
+python3 sim/transition.py actors      # what can you pull without asking anyone
+python3 sim/transition.py minimal     # smallest set that clears the target
+python3 sim/transition.py substrate   # governance and financial transitions
+python3 sim/transition.py verify      # run those plans through the ODE (needs numpy/scipy)
+```
 
 The `audit/` modules are stdlib-only and take no arguments:
 
@@ -153,7 +209,7 @@ Developed from working operational knowledge of rural industrial labor systems a
 
 **Structurally simulated, empirically unparameterized.**
 
-The model structure is complete and both engines run. Not one parameter in either has been calibrated against field data. Two headline claims have been falsified and rewritten by the model's own simulations; one has been confirmed against a deliberately strengthened test.
+The model structure is complete and all three engines run. Not one parameter in any of them has been calibrated against field data. Three headline claims have been falsified and rewritten by the model's own simulations, one confirmed against a deliberately strengthened test, and two checks have been caught being incapable of failing and replaced — once in the partial-order test, once in a sensitivity sweep written after the first was documented (ledger `F-004`, `F-011`). Knowing about a failure mode did not prevent repeating it, which is the argument for the validator.
 
 The open unknowns most worth attacking are listed in `legacy/ledger.json` under `open_unknowns_summary`. The largest is that the entire hub argument rests on an assumed correlation between hazard recognition capacity and trust-network degree that has never been measured in the field.
 

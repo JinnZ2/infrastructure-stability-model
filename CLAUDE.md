@@ -25,7 +25,8 @@ It is a specification layer (JSON schemas) plus two runnable simulation engines,
 ├── node-detection.json       # Node identification via behavioral signal proxies
 ├── sim/
 │   ├── sim.py                # Mean-field ODE engine
-│   └── network_sim.py        # Agent-based trust-network engine
+│   ├── network_sim.py        # Agent-based trust-network engine
+│   └── transition.py         # Incumbent -> target design by authority tier (stdlib only)
 ├── audit/                    # 13 independent stdlib-only diagnostic modules
 ├── figures/                  # Generated plots (reproducible, not archived)
 ├── legacy/                   # Falsified/superseded/orphaned artifacts — evidence, not an attic
@@ -66,6 +67,7 @@ No build system, no test suite, no linter.
 
 - **Validate before committing any schema or ledger change: `python3 validate.py`** (add `--full` to also run every audit module). It enforces the rules in this file — JSON parses, no smart quotes, ledger entries complete and in-vocabulary with a named unknown, referenced paths exist.
 - Run the sims: `python3 sim/sim.py all` and `python3 sim/network_sim.py all`. Both write to `figures/` regardless of working directory. `sim/sim.py all` takes several minutes.
+- Run the transition module: `python3 sim/transition.py all`. Stdlib-only by design so it works without an install step — `validate.py` fails the build if a third-party import appears at module level. Its `verify` mode needs numpy/scipy and degrades with a message without them.
 - Run any audit module directly: `python3 audit/<module>.py`. All are stdlib-only and take no arguments. All 13 currently execute cleanly.
 
 ## JSON Schema Conventions
@@ -96,6 +98,8 @@ Each core JSON schema follows this structure:
 - Maintain semantic consistency of parameter names across files.
 - Update `companion_schemas` arrays and the `repository_map` in `index.json` when adding, moving, or renaming files. Path claims drift like any other claim (ledger `F-007`).
 - Preserve the measurement tier hierarchy: tier-1 physical > tier-2 behavioral > tier-3 financial.
+- Levers carry an `authority_tier` as well as an impact rating. Do not rank levers for a reader without saying whose consent each one needs (ledger `F-009`). Report the top three as a **set**, never as an ordering — the ordering does not survive perturbation of its own inputs (ledger `F-010`).
+- **Before reporting that a check passed, construct the input that should make it fail and confirm it does.** This repo has now shipped two checks that could not fail: the partial-order schedule (`F-004`) and a sensitivity sweep written in full knowledge of it (`F-011`).
 - Signal obstruction (B_i) must be reduced before activation outreach **in the same locality** — the constraint is local, not global (ledger `F-004`). Do not restate it as an aggregate-labor or Phi claim; it is topological (ledger `F-002`, `F-003`).
 - Figures are output, not source. Regenerate them rather than editing; do not archive old ones.
 - Reference Tainter, West, and complex systems cascade theory where applicable.

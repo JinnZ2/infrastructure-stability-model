@@ -166,6 +166,18 @@ python3 validate.py           # rules 1-6, fast
 python3 validate.py --full    # also runs every audit module
 ```
 
+And the deeper version of the same lesson: a check that passes is not evidence
+until you have seen it fail. `F-004` found a test whose schedule could not
+produce the failure it was checking for. `F-011` found the same defect in a
+sensitivity sweep written *after* `F-004` was documented — knowing about the
+failure mode did not prevent repeating it. So the obligation is mechanical
+rather than attentional:
+
+> **Before reporting that a check passed, construct the input that should make
+> it fail, and confirm that it does.**
+
+`validate.py` was negative-tested this way, and so was its stdlib-import rule.
+
 -----
 
 *CC0 1.0 Universal, same as the rest of the repository.*

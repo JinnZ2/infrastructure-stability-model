@@ -1,9 +1,9 @@
 {
 "$schema": "https://json-schema.org/draft/2020-12/schema",
-"$id": "infrastructure-stability-model/v1.0/intervention_framework",
+"$id": "infrastructure-stability-model/v1.1/intervention_framework",
 "title": "Infrastructure Stability Intervention Decision Framework",
 "description": "State-to-action mapping for infrastructure stabilization. Multi-lever, phase-sequenced. Single-lever approaches fail because B_i, epsilon, L_f_active, and kappa interact nonlinearly.",
-"version": "1.0.0",
+"version": "1.1.0",
 
 "core_principle": "This is stability management under stress, not optimization to a fixed point. Goal is desynchronization of failure events and maximal system resilience given latent-node constraints. Levers are coupled. Order of operations is a constraint, not a preference.",
 
@@ -37,6 +37,14 @@
 "levers": {
 "L1": {
 "id": "L1",
+"authority_tier": 0,
+"authority_note": "A crew, union local, or community can traverse peer networks and validate competency without asking anyone. No statute grants or withholds the right to talk to people you already know.",
+"effort_normalized": 0.25,
+"effect_normalized": 0.9,
+"reversibility": "low",
+"reversibility_note": "A burned node does not un-burn. See ledger F-003 — the damage is to network topology, and topology does not recover on the timescale of a campaign.",
+"incumbent_state": "credential_broadcast_recruitment_through_HR_channels",
+"target_state": "lateral_referral_from_trusted_hub_nodes",
 "name": "latent_node_activation",
 "description": "Identify and activate suppressed high-skill nodes via lateral network traversal and competency-first validation.",
 "impact": "very_high",
@@ -62,6 +70,14 @@
 
 "L2": {
   "id": "L2",
+"authority_tier": 1,
+"authority_note": "Requires whoever assigns work. A shift supervisor or crew lead can do it inside their own scope; no external permission needed.",
+"effort_normalized": 0.15,
+"effect_normalized": 0.65,
+"reversibility": "high",
+"reversibility_note": "A deployment assignment can be reversed next week at no structural cost.",
+"incumbent_state": "seniority_treated_as_cost_center_and_retirement_liability",
+"target_state": "high_R_i_nodes_placed_at_high_kappa_interfaces_as_hazard_amplifiers",
   "name": "older_node_priority_deployment",
   "description": "Front-load older high-R_i, high-L_f nodes into safety-critical roles and high-kappa interfaces. Use as hazard amplifiers and mentor hubs.",
   "impact": "high",
@@ -80,6 +96,13 @@
 
 "L3": {
   "id": "L3",
+"authority_tier": 3,
+"authority_note": "Credential gates are usually statutory or set by an accrediting body. A firm can build a parallel competency pathway inside its own hiring, but cannot remove the external gate.",
+"effort_normalized": 0.8,
+"effect_normalized": 0.85,
+"reversibility": "medium",
+"incumbent_state": "credential_as_precondition_for_practice",
+"target_state": "demonstrated_competency_as_precondition_with_credential_as_one_evidence_type",
   "name": "epsilon_reduction",
   "description": "Reduce labor exclusion coefficient by replacing credential gates with competency validation pathways.",
   "impact": "high",
@@ -98,6 +121,13 @@
 
 "L4": {
   "id": "L4",
+"authority_tier": 0,
+"authority_note": "An alternative visibility channel is a bulletin board, a shared log, or a standing agenda item. Local hierarchy can be routed around without its consent, which is the entire point.",
+"effort_normalized": 0.2,
+"effect_normalized": 0.7,
+"reversibility": "high",
+"incumbent_state": "contribution_visible_only_through_the_hierarchy_that_suppresses_it",
+"target_state": "parallel_attribution_channel_outside_the_suppressing_layer",
   "name": "B_i_reduction",
   "description": "Reduce signal obstruction factor. Create alternative visibility channels for latent node contributions bypassing local hierarchy suppression.",
   "impact": "medium_high",
@@ -116,6 +146,14 @@
 
 "L5": {
   "id": "L5",
+"authority_tier": 2,
+"authority_note": "Capital allocation. Requires whoever approves the expansion budget — a board, a council, a utility commission.",
+"effort_normalized": 0.35,
+"effect_normalized": 0.55,
+"reversibility": "high",
+"reversibility_note": "Throttled expansion can be un-throttled. This is the cheapest lever to undo and the easiest to restart, which is why it is the natural first ask of a reluctant board.",
+"incumbent_state": "expansion_projects_prioritized_over_maintenance_backlog",
+"target_state": "maintenance_backlog_burn_down_prioritized_until_Phi_recovers",
   "name": "complexity_growth_throttle",
   "description": "Temporarily reduce rate of expansion projects relative to maintenance prioritization. Prevents C from outpacing L_f_active recovery.",
   "impact": "medium",
@@ -133,6 +171,14 @@
 
 "L6": {
   "id": "L6",
+"authority_tier": 2,
+"authority_note": "Decentralization touches system architecture and usually interconnection agreements.",
+"effort_normalized": 0.75,
+"effect_normalized": 0.5,
+"reversibility": "low",
+"reversibility_note": "Coupling exhibits ratchet behavior — it is far easier to add than to remove. Decoupling decisions are close to permanent.",
+"incumbent_state": "efficiency_optimized_tight_coupling_with_single_points_of_failure",
+"target_state": "islandable_segments_with_local_response_authority",
   "name": "kappa_reduction",
   "description": "Reduce system coupling through decentralization. Decreases cascade probability and lowers effective beta_eff.",
   "impact": "medium",
@@ -150,6 +196,13 @@
 
 "L7": {
   "id": "L7",
+"authority_tier": 3,
+"authority_note": "Compensation structure requires a board or a regulator. This is the highest-consent lever in the set and the slowest to bite.",
+"effort_normalized": 0.7,
+"effect_normalized": 0.4,
+"reversibility": "medium",
+"incumbent_state": "compensation_coupled_to_financial_yield_proxies_which_are_a_high_pass_filter_on_physical_state",
+"target_state": "compensation_coupled_to_tier_1_physical_reliability_metrics",
   "name": "management_incentive_realignment",
   "description": "Couple executive compensation to physical infrastructure reliability metrics rather than purely financial yield proxies.",
   "impact": "medium_low_short_term",
@@ -165,6 +218,60 @@
   "effect_on_model": "reduces Y_bias, increases S_weight in dC/dt — slows complexity growth and increases maintenance prioritization over time"
 }
 
+},
+
+"transition_layer": {
+"description": "The seven levers act on the physical-labor system. They assume an actor already permitted to pull them. This section models the governing and financial substrate that grants or withholds that permission, and the active steps that carry it from the incumbent design to the target design. Added 2026-08-15; see ledger F-009 for why the framework was incomplete without it.",
+
+"why_this_layer_exists": "Ranking levers by impact and time constant implies the binding constraint is knowing which lever to pull. It is not. L1 and L4 — the two highest-leverage levers in the set — need no external consent at all, while L3 and L7 need a legislature or a board. A framework that does not carry the consent dimension will route a reader with no institutional authority toward levers they cannot pull, and away from the ones they can. That is a design defect, not a missing nicety.",
+
+"authority_tiers": {
+"0": "No external consent. A crew, a community, a union local, or a single competent person acting inside their own scope. Cannot be withheld because it was never granted.",
+"1": "Site or crew-lead scope. Work assignment, sequencing, local practice.",
+"2": "Firm, board, or municipal scope. Capital allocation, architecture, interconnection.",
+"3": "State or federal scope. Statute, accreditation, licensure, compensation regulation."
+},
+
+"substrate_states": {
+"governance": {
+"incumbent": "permission_before_response — local action requires central authorization in advance. Response latency is the authorization latency, which is uncoupled from the constraint timescale.",
+"target": "response_then_audit — local nodes respond within a declared scope and log it; central authority audits afterward and retains the power to rule the response invalid.",
+"active_steps": ["declare_local_scope_explicitly", "instrument_the_response_log_before_it_is_needed", "establish_the_audit_window_and_who_holds_it", "exercise_it_on_a_low_stakes_constraint_first"],
+"audit_modules": ["audit/biological_response_infrastructure.py", "audit/audit_authority_scope.py"],
+"note": "The target is not the absence of central authority. It is central authority that validates after the fact instead of blocking before it. An authority that cannot resource its audit within its declared window has exited the scope of its claim — that is what audit_authority_scope.py computes."
+},
+"regulatory": {
+"incumbent": "rule_applied_outside_declared_scope — regulations written for an operating envelope continue to be enforced after conditions have left that envelope, producing the harm the rule was written to prevent.",
+"target": "scope_conditional_enforcement — every rule carries its operating envelope; when conditions exit it, the rule is suspended for that situation while its first-principle intent is preserved.",
+"active_steps": ["record_first_principle_intent_for_each_binding_rule", "record_the_operating_envelope_the_rule_assumed", "measure_current_conditions_against_it", "document_the_scope_exit_before_acting_not_after"],
+"audit_modules": ["audit/regulatory_scope_audit.py", "audit/timing_as_constraint.py"]
+},
+"corporate": {
+"incumbent": "charter_as_permanent_grant — operating privilege treated as unconditional and indefinite.",
+"target": "charter_as_conditional_permission — operating privilege conditioned on serving community function, with a declared crisis response threshold and a contingency that activates on failure to meet it.",
+"active_steps": ["write_down_the_implicit_charter_terms_already_in_force", "declare_the_response_threshold_in_advance", "record_response_or_non_response_when_crisis_arrives", "publish_the_record"],
+"audit_modules": ["audit/corporate_charter_scope_audit.py"]
+},
+"financial": {
+"incumbent": "tier_3_proxy_metrics_govern — capital allocation and executive incentive are driven by financial signals, which measurement.json classifies as the slowest and most filtered tier. Marginal-regime degradation is structurally invisible to them.",
+"target": "tier_1_physical_metrics_route_directly_to_the_decision_layer, in parallel with financial reporting and explicitly compared against it.",
+"active_steps": ["stand_up_the_physical_dashboard_beside_the_financial_one", "route_it_on_a_30_day_cycle_not_a_quarterly_one", "publish_the_divergence_between_the_two_as_its_own_metric", "only_then_couple_compensation_to_it"],
+"audit_modules": ["audit/harmonic_drain_audit.py", "audit/eroi_real_time_audit.py"],
+"sequencing_note": "Coupling compensation to a physical metric before the metric is trusted and instrumented produces measurement gaming, not measurement. The dashboard must exist and be believed before L7 is pulled. This mirrors the B_i-before-activation constraint at the financial layer: build the credible channel first, then attach consequences to it."
+},
+"labor": {
+"incumbent": "credential_as_gate — the ability to practice is granted by credential possession, independent of demonstrated capacity.",
+"target": "competency_as_gate_with_credential_as_one_evidence_type",
+"active_steps": ["build_the_parallel_competency_assessment_inside_existing_hiring_scope", "have_it_administered_by_field_credible_practitioners", "record_outcomes_against_credentialed_baseline", "present_the_comparison_to_the_accrediting_body_last_not_first"],
+"audit_modules": ["audit/induced_incompetence_cascade.py"],
+"note": "The last step is deliberately last. A tier-3 ask backed by a tier-0 evidence record is a different ask than a tier-3 ask backed by an argument."
+}
+},
+
+"general_pattern": "Every substrate transition in this table has the same shape: build the parallel channel at tier 0, run it until it produces a record, and only then make the tier-2 or tier-3 ask using that record as the argument. This is the same structure as the B_i-before-activation constraint (ledger F-004) applied to institutions rather than to nodes — establish the credible channel before attaching consequence to it, or the attempt confirms the prior it was meant to overturn.",
+
+"evidence_status": "untested",
+"evidence_note": "Every effort, effect, and authority-tier value in this section is asserted from the structure of the levers, not measured. No transition in this table has been observed running. The numbers are a harness for disagreement, not a result — override them and rerun. See ledger F-010."
 },
 
 "lever_interaction_matrix": {

@@ -14,7 +14,9 @@ Verifies:
   4. Every ledger verdict is in the documented vocabulary.
   5. Every artifact path referenced by a ledger entry exists.
   6. Every path in index.json's repository_map exists.
-  7. Every audit/ module imports and runs.
+  7. Every audit/ module imports and runs; sim/transition.py runs in each of
+     its stdlib-only modes and imports nothing outside the standard library
+     at module level.
 
 Usage:
   python3 validate.py           # rules 1-6 (fast)
@@ -24,6 +26,7 @@ Exit code 0 if clean, 1 otherwise. Stdlib only.
 License: CC0 1.0 Universal
 """
 
+import ast
 import glob
 import json
 import os
@@ -140,19 +143,63 @@ def check_index_paths(parsed):
     walk(index.get("repository_map", {}))
 
 
+def _run(argv, rule, label):
+    result = subprocess.run(argv, capture_output=True, timeout=180, cwd=ROOT)
+    if result.returncode != 0:
+        last = result.stderr.decode(errors="replace").strip().splitlines()
+        detail = last[-1] if last else f"exit {result.returncode}"
+        fail(rule, f"{label}: {detail}")
+
+
 def check_audit_modules():
     modules = sorted(glob.glob(os.path.join(ROOT, "audit", "*.py")))
     if not modules:
         fail("audit", "no modules found in audit/")
     for module in modules:
-        result = subprocess.run(
-            [sys.executable, module],
-            capture_output=True, timeout=120, cwd=ROOT,
-        )
-        if result.returncode != 0:
-            last = result.stderr.decode(errors="replace").strip().splitlines()
-            detail = last[-1] if last else f"exit {result.returncode}"
-            fail("audit", f"{rel(module)}: {detail}")
+        _run([sys.executable, module], "audit", rel(module))
+
+    transition = os.path.join(ROOT, "sim", "transition.py")
+    if not os.path.exists(transition):
+        fail("transition", "sim/transition.py missing")
+        return
+    for mode in ("actors", "minimal", "substrate", "sensitivity",
+                 "schedule", "all"):
+        _run([sys.executable, transition, mode], "transition",
+             f"sim/transition.py {mode}")
+    check_transition_is_stdlib(transition)
+
+
+# Third-party modules this repo uses. Anything here is fine inside sim/sim.py
+# and sim/network_sim.py, and must not appear at module level in
+# sim/transition.py, which is stdlib-only so a reader without numpy can use it.
+THIRD_PARTY = {"numpy", "scipy", "matplotlib"}
+
+
+def check_transition_is_stdlib(path):
+    """
+    Assert sim/transition.py imports nothing third-party at module level.
+
+    Running the modes is not sufficient evidence: this machine has numpy
+    installed, so a stray top-level import would run fine here and fail on
+    the machine the claim is made for. Checking the import graph is the check
+    that can actually fail. Function-level imports are allowed — the verify
+    mode imports numpy inside the function and degrades gracefully without it.
+    """
+    with open(path, encoding="utf-8") as fh:
+        tree = ast.parse(fh.read(), filename=path)
+
+    for node in tree.body:  # module level only, not nested in functions
+        names = []
+        if isinstance(node, ast.Import):
+            names = [a.name.split(".")[0] for a in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            names = [node.module.split(".")[0]]
+        for name in names:
+            if name in THIRD_PARTY:
+                fail("transition",
+                     f"{rel(path)}:{node.lineno} imports '{name}' at module "
+                     f"level. This module is stdlib-only by design so it runs "
+                     f"without an install step.")
 
 
 def main():
