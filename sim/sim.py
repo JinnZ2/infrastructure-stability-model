@@ -6,17 +6,20 @@ Demonstrates how intervention lever sequencing determines whether Phi (maintenan
 burden ratio) stabilizes or crosses the structural decay threshold.
 
 Usage:
-  python3 sim.py                # run core 4-scenario comparison
-  python3 sim.py sweep          # parameter sensitivity analysis
-  python3 sim.py handoff        # temporal cohort handoff visualization
-  python3 sim.py shocks         # stochastic disruption Monte Carlo
-  python3 sim.py all            # run everything
-  python3 sim.py --show         # also display interactive plots (with any mode)
+  python3 sim/sim.py                # run core 4-scenario comparison
+  python3 sim/sim.py sweep          # parameter sensitivity analysis
+  python3 sim/sim.py handoff        # temporal cohort handoff visualization
+  python3 sim/sim.py shocks         # stochastic disruption Monte Carlo
+  python3 sim/sim.py all            # run everything
+  python3 sim/sim.py --show         # also display interactive plots (with any mode)
+
+Plots are written to figures/ at the repository root.
 
 Authors: Kavik, Claude (Anthropic)
 License: CC0 1.0 Universal
 """
 
+import os
 import sys
 from dataclasses import dataclass, field
 from typing import Callable, Optional
@@ -25,6 +28,21 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+
+
+# ---------------------------------------------------------------------------
+# Figure output — resolved against the repo root, not the current directory
+# ---------------------------------------------------------------------------
+
+FIG_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures"
+)
+
+
+def _fig(name):
+    """Absolute path for a figure output. Independent of working directory."""
+    os.makedirs(FIG_DIR, exist_ok=True)
+    return os.path.join(FIG_DIR, name)
 
 
 # ---------------------------------------------------------------------------
@@ -379,8 +397,9 @@ SCENARIO_STYLES = {
 }
 
 
-def plot_phi_trajectory(results, save_path="phi_trajectory.png"):
+def plot_phi_trajectory(results, save_path=None):
     """Plot Phi over time for all scenarios with regime threshold bands."""
+    save_path = save_path or _fig("phi_trajectory.png")
     fig, ax = plt.subplots(figsize=(12, 6))
 
     # Regime bands
@@ -419,8 +438,9 @@ def plot_phi_trajectory(results, save_path="phi_trajectory.png"):
     return fig
 
 
-def plot_state_variables(results, save_path="state_variables.png"):
+def plot_state_variables(results, save_path=None):
     """Plot key state and derived variables for all scenarios."""
+    save_path = save_path or _fig("state_variables.png")
     fig = plt.figure(figsize=(14, 10))
     gs = gridspec.GridSpec(2, 3, hspace=0.35, wspace=0.30)
 
@@ -517,7 +537,7 @@ def run_sensitivity_sweep(save_prefix="sensitivity", n_points=40):
     fig.suptitle("Parameter Sensitivity: \u03a6 at 60 Months vs Single Parameter Variation",
                  fontsize=13, y=1.02)
     fig.tight_layout()
-    path_1d = f"{save_prefix}_1d.png"
+    path_1d = _fig(f"{save_prefix}_1d.png")
     fig.savefig(path_1d, dpi=150, bbox_inches="tight")
     print(f"Saved: {path_1d}")
 
@@ -563,7 +583,7 @@ def run_sensitivity_sweep(save_prefix="sensitivity", n_points=40):
     ax2.set_ylabel("Signal obstruction (B_i)", fontsize=11)
     ax2.set_title("Stability Landscape: \u03a6 at 60 Months", fontsize=13)
     fig2.tight_layout()
-    path_2d = f"{save_prefix}_2d.png"
+    path_2d = _fig(f"{save_prefix}_2d.png")
     fig2.savefig(path_2d, dpi=150, bbox_inches="tight")
     print(f"Saved: {path_2d}")
 
@@ -646,8 +666,9 @@ def ode_system_cohort(t, y, base_params, interventions):
     return [dC, dL_old, dL_young, dp_engage, dkappa, d_prior_dismissal, d_mentor_hours]
 
 
-def run_handoff_analysis(save_path="temporal_handoff.png"):
+def run_handoff_analysis(save_path=None):
     """Simulate and visualize the older→younger cohort handoff."""
+    save_path = save_path or _fig("temporal_handoff.png")
     print("\n=== Temporal Cohort Handoff Analysis ===")
 
     # Correct-sequence interventions (same as core scenario 3)
@@ -782,8 +803,9 @@ def run_handoff_analysis(save_path="temporal_handoff.png"):
 # EXTENSION 3: Stochastic Shocks (Monte Carlo)
 # ===========================================================================
 
-def run_stochastic_shocks(save_path="stochastic_shocks.png", n_runs=50, seed=42):
+def run_stochastic_shocks(save_path=None, n_runs=50, seed=42):
     """Monte Carlo with Poisson-distributed disruption events."""
+    save_path = save_path or _fig("stochastic_shocks.png")
     print(f"\n=== Stochastic Shock Simulation ({n_runs} runs) ===")
     rng = np.random.default_rng(seed)
 

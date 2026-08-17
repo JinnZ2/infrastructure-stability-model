@@ -1,0 +1,284 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "infrastructure-stability-model/v1.2/legacy-ledger",
+ "title": "Falsification Ledger",
+ "description": "Record of every claim in this repository that has been tested, and what the test did to it. Append-only. Entries are never edited after resolution except to add a rerun result or a follow-on entry id. See METHOD.md for the protocol and the verdict vocabulary.",
+ "version": "1.2.0",
+ "license": "CC0 1.0 Universal",
+ "maintained_under": "METHOD.md",
+ "verdict_vocabulary": {
+  "confirmed": "Survived a test that could have broken it. The test is recorded so it can be rerun.",
+  "falsified": "The claim failed. Claim edited at source; artifact moved to legacy/ if one existed.",
+  "revised": "Partly true. The surviving claim is narrower than the original.",
+  "superseded": "Not wrong, but replaced by something strictly better.",
+  "orphaned": "Depends on something not present in this repository. Cannot run here.",
+  "untested": "Asserted, never run. Named explicitly so it is not mistaken for evidence.",
+  "irrecoverable": "Falsified, but the prior artifact was lost before this ledger existed."
+ },
+ "entries": [
+  {
+   "id": "F-001",
+   "date_opened": "2026-02-21",
+   "date_resolved": "2026-03-22",
+   "subject": "Schema files are valid JSON and machine-ingestible",
+   "hypothesis": "All schemas are JSON draft 2020-12, versioned, and structured for machine ingestion. An AI system can parse index.json first and follow it to the rest.",
+   "test": "python3 -c \"import json; json.load(open(f))\" against all five schema files.",
+   "result": "All five failed to parse. Root cause: Unicode smart quotes throughout. Additional defects: embedded markdown code fences inside three files, missing closing braces in the measurement protocol, and two files whose contents did not match their filenames (intervention.json held the measurement protocol; measurement.json held the schema index).",
+   "verdict": "falsified",
+   "claim_before": "All schemas are JSON, versioned, and structured for machine ingestion.",
+   "claim_after": "Same claim, now enforced: standard ASCII double quotes only, no markdown fences inside JSON, and every file validated with python3 json.load before commit. Recorded as a standing rule in CLAUDE.md.",
+   "unknowns_opened": [
+    "Whether any external consumer had already forked or linked the unparseable versions",
+    "Whether other prose in README referenced the pre-rename filenames (it did — see F-007)",
+    "Whether a hand-applied rule survives without a check (it did not — see rerun)"
+   ],
+   "artifact": null,
+   "precedent_retained": "A schema that has never been parsed is not a schema. Machine-readability is a claim like any other and requires a run to support it. A rule with no check is a preference.",
+   "rerun": "commit 656a6b5 fixed the parse errors and all five files have parsed since. Rechecked 2026-08-14 with a scan for the specific defect rather than for parseability, and the fix proved incomplete: one smart apostrophe survived in system-model.json line 246 for five months. It parsed fine, so nothing caught it. Fixed, and the rule is now enforced by validate.py rather than by intention."
+  },
+  {
+   "id": "F-002",
+   "date_opened": "2026-03-22",
+   "date_resolved": "2026-08-14",
+   "subject": "Wrong-order activation (outreach before B_i reduction) is a catastrophic failure",
+   "hypothesis": "If activation outreach begins before signal obstruction B_i is reduced, activated nodes experience confirmed dismissal, p_engage collapses, and the intervention fails. 'Most real-world workforce initiatives fail here.'",
+   "test": "python3 sim/sim.py — mean-field ODE, four intervention scenarios, Phi tracked to 120 months.",
+   "result": "Phi at 120 months: baseline (no intervention) 1.451; wrong order 0.617; correct sequence 0.307; emergency-all-levers-at-month-36 0.384. Wrong-order activation stabilized the system well below the Phi=0.7 stability threshold and outperformed no intervention by a wide margin.",
+   "verdict": "falsified",
+   "claim_before": "Wrong-order activation causes the intervention to fail. Initiatives that get the levers right but the order wrong fail.",
+   "claim_after": "Wrong-order activation is a large penalty, not a failure. In aggregate terms it still beats no intervention decisively. The failure it produces is not visible in Phi. See F-003 for where the damage actually shows up.",
+   "unknowns_opened": [
+    "If the aggregate metric does not show the damage, what does the damage act on — and does the mean-field formulation hide it by construction?",
+    "Whether a mean-field model can represent re-suppression at all, given that it averages over exactly the node heterogeneity the claim is about"
+   ],
+   "artifact": null,
+   "precedent_retained": "The sequencing constraint may not be defended on aggregate labor or Phi grounds. Any future statement of it must name the quantity it actually degrades.",
+   "rerun": "F-003 — agent-based model with explicit node heterogeneity and network topology."
+  },
+  {
+   "id": "F-003",
+   "date_opened": "2026-03-22",
+   "date_resolved": "2026-08-14",
+   "subject": "Where wrong-order activation actually does its damage",
+   "hypothesis": "Following F-002: the sequencing penalty is topological rather than aggregate. High-R_i nodes are trust-network hubs; they activate first and also detect institutional theater first, so wrong-order outreach burns precisely the nodes that seed the cascade. Aggregate labor counts should therefore understate the damage.",
+   "test": "python3 sim/network_sim.py all — 200-node Watts-Strogatz trust network for the base comparison, 250 nodes across 5 communities for the community-structure run.",
+   "result": "Wrong order vs correct order, 200 nodes: active 152 vs 200, permanently suppressed 48 vs 0, hub survival 30% vs 100%, L_f 67.3 vs 97.0. Community run, 250 nodes: bridge-node survival 22% vs 100%, inter-community edges alive 44% vs 100%, while all 5 communities were still reached under both orders.",
+   "verdict": "revised",
+   "claim_before": "Wrong-order activation causes the intervention to fail (as narrowed by F-002 to: causes a large aggregate penalty).",
+   "claim_after": "Wrong-order activation is hub-destroying, not intervention-destroying. Aggregate labor falls ~31%, but hub survival falls from 100% to 30% and inter-community connectivity to 44%. The network is left connected enough to function and too fragmented to propagate again. The cost is paid by the next intervention, not this one.",
+   "unknowns_opened": [
+    "Whether the second intervention through a hub-depleted network is measurably harder — the model does not currently run a second campaign after a burned first one",
+    "Whether real trade trust networks are small-world with the assumed clustering, or something else entirely; the topology is assumed, never measured",
+    "Whether R_i and node degree actually correlate in the field, which is the assumption the whole hub argument rests on"
+   ],
+   "artifact": null,
+   "precedent_retained": "The sequencing constraint is real but must be stated in topological terms — hub and bridge survival, network reach for the next campaign — never as aggregate labor or Phi.",
+   "rerun": "F-004 — tests whether the constraint is local or global."
+  },
+  {
+   "id": "F-004",
+   "date_opened": "2026-03-22",
+   "date_resolved": "2026-08-14",
+   "subject": "Whether the sequencing constraint is global (regional phasing unsafe) or local",
+   "hypothesis": "If some regions begin activation while neighbouring regions are still at high B_i, the activation signal leaks across bridge edges and burns nodes in the unprepared regions. Regionally phased rollouts would then be unsafe, and the sequencing constraint would be a global one.",
+   "test": "python3 sim/network_sim.py partial as committed; then a corrected schedule; then a sweep of the leak-intensity parameter. Corrected schedule holds regions 2-4 at high B_i (B_i reduction starting months 12/15/18) while regions 0-1 activate at month 3. Sweep over config.leak_intensity in {0.3, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0}, 250 nodes, 5 communities, seed 42.",
+   "result": "First, a defect in the committed test: the parallel_mixed strategy sets B_i reduction to month 0 in every region and varies only activation timing, so no region is ever at high B_i when leakage arrives. Its null result was an artifact of the schedule, not evidence. Under the corrected schedule the result still holds — 250 active, 0 suppressed, 100% bridge survival, identical to uniform-correct — against the wrong-uniform reference of 189 active, 61 suppressed, 22% bridge survival. The leak sweep locates the boundary: no damage at leak_intensity 0.3 through 2.0; first damage at 4.0 (4 suppressed, 97% bridge survival); substantial at 8.0 (33 suppressed, 83%) and 16.0 (46 suppressed, 75%).",
+   "verdict": "confirmed",
+   "claim_before": "Not previously claimed in the schemas. The partial-order analysis existed in code with a test that did not test it.",
+   "claim_after": "The sequencing constraint is local, not global. Regionally phased rollouts are safe: a region may begin activation while neighbours are still reducing B_i, provided each region's own B_i is down before its own outreach. Leaked cross-boundary signal does no measurable damage until it exceeds ~4x its assumed intensity — which is above the intensity of a locally addressed signal (0.56), i.e. outside any regime where leakage is weaker than direct contact.",
+   "unknowns_opened": [
+    "leak_intensity is chosen, not measured. The safety result holds only while leaked signal is weaker per contact than direct outreach — plausible, but unverified in the field",
+    "The 0.30 B_i damage threshold is a hard cutoff in the model; a soft threshold might leak damage below it",
+    "No region in the sweep was held at high B_i indefinitely; very long holds next to an active neighbour are untested"
+   ],
+   "artifact": null,
+   "precedent_retained": "A test whose schedule cannot produce the failure it is checking for is not evidence of safety. Any future partial-order claim must show that the unprepared regions were genuinely unprepared at the moment of leakage.",
+   "rerun": "Leak-intensity sweep, above. leak_intensity is now an explicit SimConfig field in sim/network_sim.py carrying a comment pointing at this entry."
+  },
+  {
+   "id": "F-005",
+   "date_opened": "2026-05-10",
+   "date_resolved": "2026-08-14",
+   "subject": "audit/audit_producers.py — adapter shim for a unified audit output bus",
+   "hypothesis": "The heterogeneous audit modules can be unified behind a single output bus by wrapping each as a ConstraintProducer emitting into a shared AuditAccumulator, with ReadinessGate evaluating the result.",
+   "test": "python3 audit/audit_producers.py",
+   "result": "ModuleNotFoundError: No module named 'audit_substrate'. The file imports audit_substrate (Channel, ConstraintResult, LifecycleCost, AuditAccumulator, ConstraintProducer, ReadinessGate, and others) and audit_vestibular. Neither exists in this repository. The sensory-audit stack it adapts — haptic, acoustic, olfactory, visual fouling, vestibular — is also absent. The other 13 audit modules all execute cleanly and are stdlib-only.",
+   "verdict": "orphaned",
+   "claim_before": "audit/ contains an adapter layer unifying the audit modules behind a shared accumulator.",
+   "claim_after": "No such unification exists in this repository. The 13 live audit modules are independent, stdlib-only, and each prints its own report. audit_producers.py is retained in legacy/ as a design record of the intended bus, not as running code.",
+   "unknowns_opened": [
+    "Which repository holds audit_substrate and audit_vestibular, and whether that stack is still maintained",
+    "Whether the 13 modules present here would fit the ConstraintProducer shape without changes to their internals",
+    "Whether a shared accumulator is the right target at all, or whether independent modules with independent reports is the more honest structure for audits meant to be run selectively"
+   ],
+   "artifact": "legacy/audit_producers.py",
+   "precedent_retained": "The ConstraintProducer / AuditAccumulator / ReadinessGate architecture — producers emit typed ConstraintResult and LifecycleCost records into a shared bus, a gate evaluates readiness against them — is a live design claim and the natural target for this repo's audit modules. The interface shape in the file is the specification; only its imports are dead.",
+   "rerun": null
+  },
+  {
+   "id": "F-006",
+   "date_opened": "2026-05-10",
+   "date_resolved": null,
+   "subject": "collapse_substrate_mapping.py v1 — 'managed decline vs rapid transition' as a balanced debate",
+   "hypothesis": "The managed-decline-versus-rapid-transition question can be treated as a balanced scientific debate between two positions.",
+   "test": "Re-examination during the v2 rewrite. No recorded run.",
+   "result": "The framing was judged to be the pathology itself — it lends scientific credibility to a position that is not being advanced scientifically, because the institutional mechanisms promoting it (patents, regulation, litigation, credentialing) are the same mechanisms blocking the experiments that would generate comparison data. The proposition is therefore not falsifiable as posed and can only be evaluated on the gap between stated goals and observable institutional behavior.",
+   "verdict": "irrecoverable",
+   "claim_before": "Unrecoverable. v1 was never committed; only v2's characterization of it survives.",
+   "claim_after": "Present in audit/collapse_substrate_mapping.py: the framing is named as a methodological failure, the claim-versus-action gap is documented, and falsifiable claims testable without institutional permission are provided in its place.",
+   "unknowns_opened": [
+    "Whether v2's characterization of v1 is fair — unverifiable, because v1 does not exist",
+    "Whether v1 contained anything worth keeping that was discarded with it"
+   ],
+   "artifact": null,
+   "precedent_retained": "This is the entry that motivates METHOD.md. A correction whose subject was destroyed cannot be audited. From this point, superseded artifacts move to legacy/ rather than being overwritten in place.",
+   "rerun": null
+  },
+  {
+   "id": "F-007",
+   "date_opened": "2026-03-22",
+   "date_resolved": "2026-08-14",
+   "subject": "README and index.json describe the repository accurately",
+   "hypothesis": "The README file map and the index.json schema map describe what is actually in the repository.",
+   "test": "Direct comparison of documented paths and status claims against the working tree, 2026-08-14.",
+   "result": "Three classes of drift. (1) Stale filenames: README prose still directed readers to system_model.json, intervention_framework.json, and measurement_protocol.json — the underscore names retired in commit 656a6b5. The directory block had been corrected; the prose around it had not. (2) Undocumented content: 2 simulation engines, 14 audit modules, and 11 generated figures existed with no mention in README or index.json, which both still described a four-schema repository. (3) Stale roadmap: of seven extension_roadmap items, simulation_engine, cohort_temporal_handoff_model, and agent_based_activation_model were fully delivered, and geographic_node_distribution and network_graph_tooling partially delivered against synthetic rather than field data — all still listed as pending.",
+   "verdict": "falsified",
+   "claim_before": "Repository contains five JSON schema files at root. Validation status: theoretical, no simulation.",
+   "claim_after": "Repository contains four core schemas plus this ledger, two simulation engines, thirteen live audit modules, one orphaned module in legacy/, and generated figures. Validation status: structurally simulated, empirically unparameterized. Roadmap items carry per-item status.",
+   "unknowns_opened": [
+    "Whether a repository claiming machine-readability should carry a generated manifest rather than a hand-maintained index — hand-maintenance drifted within one commit of being corrected",
+    "Whether external forks made during the drift window are reading the stale file map"
+   ],
+   "artifact": null,
+   "precedent_retained": "Correcting a file map in one place does not correct it in the others. Path claims are claims and drift like any other.",
+   "rerun": "index.json and README.md rewritten against the working tree, 2026-08-14."
+  },
+  {
+   "id": "F-008",
+   "date_opened": "2026-05-10",
+   "date_resolved": null,
+   "subject": "audit/induced_incompetence_cascade.py — CDL training pipeline as engineered control-dependency",
+   "hypothesis": "The CDL training pipeline's goal architecture produces workers who cannot self-regulate, cannot diagnose their own degradation, cannot accumulate skill during training, and cannot advocate for themselves — making the regulations part of the system rather than a correction to it.",
+   "test": "None run. The module executes without error but performs no analysis; it is a prose specification in Python form.",
+   "result": "Not applicable. Additionally the file is incomplete: section 8 (CHOICE_ARCHITECTURE) is truncated mid-sentence at the 'Costlier path B (mastery)' bullet, and any sections beyond it are absent. A TODO marks the cut point.",
+   "verdict": "untested",
+   "claim_before": null,
+   "claim_after": "Unchanged. Recorded here so it is not mistaken for a result.",
+   "unknowns_opened": [
+    "Where the complete source is, so the truncated sections can be restored",
+    "What measurable signal would distinguish engineered control-dependency from ordinary training-pipeline neglect — without one, the claim is not testable as stated",
+    "Whether the same structure applies to other credential-gated trades, which would make it a class of finding rather than a single case"
+   ],
+   "artifact": null,
+   "precedent_retained": "Modules whose output is prose rather than computation are specifications, not evidence. They stay in audit/ and are marked untested until something runs.",
+   "rerun": null
+  },
+  {
+   "id": "F-009",
+   "date_opened": "2026-08-15",
+   "date_resolved": "2026-08-15",
+   "subject": "decision-framework.json ranks levers by impact and time constant alone",
+   "hypothesis": "Ranking the seven intervention levers by impact rating and time constant tells a reader which lever to pull. The framework is complete without a consent dimension.",
+   "test": "Read the framework as each of its own stated audiences. README directs 'engineers' and 'human coordinators' to run their parameters through the decision tree. Checked, for each lever, what institutional authority the reader would need to actually pull it.",
+   "result": "The framework's own top-rated levers split cleanly by an axis it does not carry. L1 (impact very_high) and L4 (impact medium_high) require no external consent — peer network traversal and a parallel visibility channel can be built by a crew or a community with no institutional standing. L3 (impact high) requires statute or an accrediting body; L7 requires a board or a regulator. The framework as written routes a reader with no authority toward levers they cannot pull and gives them no way to see which ones they can.",
+   "verdict": "falsified",
+   "claim_before": "Seven levers ranked by time constant and impact, with prerequisites and failure modes. Run your parameters through the decision tree to identify which regime you are in and what order to engage levers.",
+   "claim_after": "Same seven levers, each now carrying authority_tier, effort_normalized, effect_normalized, reversibility, incumbent_state, and target_state. A new transition_layer section models the governing, regulatory, corporate, financial, and labor substrate that grants or withholds permission to pull them, with the active steps for each transition.",
+   "unknowns_opened": [
+    "Whether the tier assignments hold across jurisdictions — credential gating is statutory in some trades and purely conventional in others, which would move L3 from tier 3 to tier 1 in those settings",
+    "Whether the consent-cost multipliers are superlinear as assumed, or whether consent chains are closer to additive",
+    "Whether an actor's authority tier is fixed, or whether a tier-0 evidence record measurably raises the tier they can subsequently reach — the transition_layer general_pattern assumes it does and nothing tests that"
+   ],
+   "artifact": null,
+   "precedent_retained": "A decision framework aimed at readers without institutional authority must state, per action, whose consent it needs. Impact ranking alone is not decision support for that audience; it is decision support for an audience that already holds the levers.",
+   "rerun": "sim/transition.py, which reads the new fields from the schema rather than carrying its own copy. See F-010 and F-012."
+  },
+  {
+   "id": "F-010",
+   "date_opened": "2026-08-15",
+   "date_resolved": null,
+   "subject": "sim/transition.py leverage ranking — which small modifications are most leveraged",
+   "hypothesis": "Scoring each lever as effect / (effort * consent_cost * reversibility_penalty * time_factor), under an authority budget per actor archetype, identifies the most leveraged small modifications available to a given reader.",
+   "test": "python3 sim/transition.py actors and sim/transition.py sensitivity. Five actor archetypes from field crew (tier 0) to regulator (tier 3). Rank stability measured by perturbing each lever's effect and effort independently over 400 seeded trials at +/-30%, then widening to +/-45%, +/-60%, +/-80%.",
+   "result": "The ranking is nearly identical across all five archetypes: {L1, L2, L4} occupies the top three for every actor including the regulator, whose own statutory levers L3 and L7 rank last on their own list. Ordering within the top three is not resolved — under +/-30% independent perturbation the three permute freely (each holds its exact baseline position in only 38-77% of trials). Set membership is far more robust than ordering: the top-3 set is intact in every trial at +/-30% for all five actors, first breaks at +/-45% for the firm and regulator archetypes, and has broken for every actor by +/-80%.",
+   "verdict": "untested",
+   "claim_before": null,
+   "claim_after": "What the model supports is a set claim, not a ranked list: {L1 latent node activation, L2 older node priority deployment, L4 B_i reduction} are the three highest-leverage levers for every actor archetype, and that membership survives independent perturbation of all asserted parameters up to about +/-30 to +/-45%. Their internal ordering is not resolved and should not be reported as if it were.",
+   "unknowns_opened": [
+    "Every effort and effect value is asserted in decision-framework.json. Nothing calibrates them against an observed intervention",
+    "The consent-cost multipliers {0:1.0, 1:1.6, 2:3.0, 3:6.0} are chosen. The top-3 result is not sensitive to them within the tested range, but no range was derived from anything",
+    "The diminishing-returns combination in combined_effect is a coarse stand-in for the six couplings named in lever_interaction_matrix, and is the weakest assumption in the module",
+    "Whether the near-identical ranking across actors is a finding about the levers or an artifact of penalizing high tiers twice, through both consent cost and the longer time-to-effect that consent campaigns add"
+   ],
+   "artifact": null,
+   "precedent_retained": "Report the claim at the strength the run supports. A ranking whose order does not survive perturbation of its own inputs is a set, and must be stated as one.",
+   "rerun": "F-012 runs the resulting plans through the ODE rather than leaving them as a ranking."
+  },
+  {
+   "id": "F-011",
+   "date_opened": "2026-08-15",
+   "date_resolved": "2026-08-15",
+   "subject": "The first rank-sensitivity test in sim/transition.py",
+   "hypothesis": "Perturbing every lever's effect and effort by +/-15% and +/-30% and re-ranking measures whether the leverage ordering is robust to the asserted parameters being wrong.",
+   "test": "Ran it. It reported 'rank-unstable: none' for all five actor archetypes — perfect stability under every perturbation.",
+   "result": "The result was vacuous. The implementation scaled every lever by the same factor within each trial. Leverage is effect divided by a cost term proportional to effort, so a common multiplier divides out of every score and cannot change a ranking. The test was structurally incapable of reporting instability, and its clean pass carried no information. Replaced with independent per-lever perturbation over 400 seeded trials, which immediately showed the top three permuting freely (38-77% baseline-position retention).",
+   "verdict": "falsified",
+   "claim_before": "The leverage ranking is robust: no lever moves more than one rank position under +/-30% perturbation, for any actor.",
+   "claim_after": "The ordering within the top three is not robust and permutes freely under +/-30% independent perturbation. Only set membership is robust. See F-010.",
+   "unknowns_opened": [
+    "How many other checks in this repository pass because they cannot fail — the same defect was found in the partial-order test (F-004) and now in a sensitivity test written in full knowledge of F-004",
+    "Whether a uniform-perturbation sensitivity test is ever informative, or whether independent perturbation should simply be the default form"
+   ],
+   "artifact": null,
+   "precedent_retained": "This is the second occurrence of the same defect in this repository: a test whose construction prevents the failure it checks for. F-004 found it in the partial-order schedule; this found it in a sensitivity sweep written after F-004 was documented. Knowing about the failure mode did not prevent repeating it. Before reporting a clean pass, construct the input that should make the check fail and confirm it does.",
+   "rerun": "Corrected function rerun at +/-30, 45, 60 and 80%. The instability it was supposed to detect appears at +/-30%."
+  },
+  {
+   "id": "F-012",
+   "date_opened": "2026-08-15",
+   "date_resolved": "2026-08-15",
+   "subject": "Whether the no-permission path is sufficient on its own",
+   "hypothesis": "If {L1, L2, L4} are the highest-leverage levers and L1 and L4 require no external consent, then an actor with no institutional authority can stabilize the system alone. The tier-0 path should be sufficient, not merely useful.",
+   "test": "python3 sim/transition.py verify. Each actor's minimum viable set is emitted as an intervention schedule and integrated by sim/sim.py against the four reference scenarios, with Phi sampled at 12, 36, 60 and 120 months and threshold re-crossings recorded.",
+   "result": "Phi under the tier-0 path L4 -> L1: 0.473 at 12 months, 0.426 at 36, 0.483 at 60, 0.717 at 120, re-crossing 0.70 at month 116. Baseline is 1.451 at 120 months and crosses 1.0 at month 74. Full correct sequence holds 0.307. The tier-0 path captures most of the available improvement, arrests the decay for roughly a decade, and then drifts back up. Adding L2 — one negotiated move for a crew, unilateral for a supervisor — gives 0.682 at 120 months and no re-crossing within the horizon.",
+   "verdict": "revised",
+   "claim_before": "Implied by F-010: the highest-leverage levers need no permission, therefore permission is not the binding constraint.",
+   "claim_after": "The no-permission path is a bridge, not a destination. L4 -> L1 moves the system from cascade (Phi 1.451, threshold crossed at month 74) to marginal-stable for about a decade, but adds only labor bandwidth. It touches neither the complexity ratchet (L5, tier 2) nor coupling (L6, tier 2), so C keeps growing and eventually eats the labor gain. What tier-0 action buys is the window, and the record it produces during that window is the argument for the tier-2 ask.",
+   "unknowns_opened": [
+    "The drift-back timing depends entirely on the complexity growth parameters a1 and a2 in sim/sim.py, neither of which is calibrated. The decade is an artifact of those values, not a prediction",
+    "Whether a tier-0 evidence record actually raises the probability of the subsequent tier-2 ask succeeding. This is the mechanism the whole transition_layer sequencing rests on and nothing in the repository tests it",
+    "L2 is carried into the ODE as an increase in training throughput, on the argument that older high-R_i nodes act as mentor hubs. That is a proxy for a lever the ODE has no state variable for, and it is the weakest mapping in LEVER_TO_PARAM"
+   ],
+   "artifact": null,
+   "precedent_retained": "Levers that add labor bandwidth do not hold their gain against an untouched complexity ratchet. Any claim that a tier-0 path is sufficient must state its horizon, because within this model it is not sufficient at 120 months.",
+   "rerun": null
+  }
+ ],
+ "open_unknowns_summary": {
+  "description": "Unknowns from unresolved entries, and the ones most worth attacking next. Derived from the entries above; not authoritative on its own.",
+  "highest_value": [
+   "Field measurement of trust-network topology and the R_i-to-degree correlation (F-003) — the hub argument rests entirely on it",
+   "Whether a tier-0 evidence record raises the probability of a subsequent tier-2 ask succeeding (F-012) — the entire transition sequencing rests on this and nothing tests it",
+   "A second-campaign run through a hub-depleted network (F-003) — this is where the wrong-order cost is claimed to land, and it has never been simulated",
+   "Calibration of the complexity growth parameters a1 and a2 (F-012) — they set how long a tier-0 path holds, and the answer is currently an artifact",
+   "Empirical bound on leak_intensity (F-004) — the partial-order safety result is conditional on it",
+   "Recovery of audit_substrate / audit_vestibular (F-005), or an explicit decision to respecify the bus against the 13 modules present"
+  ]
+ },
+ "metadata": {
+  "authors": [
+   "Kavik",
+   "Claude (Anthropic)"
+  ],
+  "license": "CC0 1.0 Universal",
+  "created": "2026-08-14",
+  "protocol": "METHOD.md",
+  "companion_schemas": [
+   "index.json",
+   "system-model.json",
+   "decision-framework.json",
+   "measurement.json",
+   "node-detection.json"
+  ]
+ }
+}

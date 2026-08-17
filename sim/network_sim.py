@@ -12,16 +12,19 @@ Key insight this captures:
   propagation network and removes the highest-value cascade seeds.
 
 Usage:
-  python3 network_sim.py              # original 3-scenario comparison
-  python3 network_sim.py community    # community structure + bridge node fragmentation
-  python3 network_sim.py partial      # partial-order regional phasing analysis
-  python3 network_sim.py all          # everything
-  python3 network_sim.py --show       # also display interactive
+  python3 sim/network_sim.py              # original 3-scenario comparison
+  python3 sim/network_sim.py community    # community structure + bridge node fragmentation
+  python3 sim/network_sim.py partial      # partial-order regional phasing analysis
+  python3 sim/network_sim.py all          # everything
+  python3 sim/network_sim.py --show       # also display interactive
+
+Plots are written to figures/ at the repository root.
 
 Authors: Kavik, Claude (Anthropic)
 License: CC0 1.0 Universal
 """
 
+import os
 import sys
 from dataclasses import dataclass, field
 from typing import List
@@ -29,6 +32,21 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+
+
+# ---------------------------------------------------------------------------
+# Figure output — resolved against the repo root, not the current directory
+# ---------------------------------------------------------------------------
+
+FIG_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures"
+)
+
+
+def _fig(name):
+    """Absolute path for a figure output. Independent of working directory."""
+    os.makedirs(FIG_DIR, exist_ok=True)
+    return os.path.join(FIG_DIR, name)
 
 
 # ---------------------------------------------------------------------------
@@ -174,6 +192,14 @@ class SimConfig:
     ri_transfer_floor: float = 0.1        # minimum R_i difference for transfer
     referral_prob_per_edge: float = 0.08  # monthly prob an active node refers a neighbor
     B_i_reduction_rate: float = 0.04      # monthly B_i decay under intervention
+
+    # Cross-community signal leakage (partial-order analysis only).
+    # Intensity of an activation signal that reaches a node through a bridge
+    # edge from a community that has already started activation, relative to
+    # a locally addressed one. UNMEASURED — chosen, not calibrated. The
+    # partial-order safety result is conditional on this value; see
+    # legacy/ledger.json entry F-004.
+    leak_intensity: float = 0.3
 
     # Engagement update
     engage_update_rate: float = 0.05  # base monthly p_engage update
@@ -416,8 +442,9 @@ def make_network_scenarios():
 # Plotting
 # ---------------------------------------------------------------------------
 
-def plot_network_results(all_results, save_path="network_activation.png"):
+def plot_network_results(all_results, save_path=None):
     """6-panel comparison of network simulation outcomes."""
+    save_path = save_path or _fig("network_activation.png")
     fig = plt.figure(figsize=(16, 11))
     gs = gridspec.GridSpec(3, 2, hspace=0.38, wspace=0.28)
 
@@ -449,8 +476,9 @@ def plot_network_results(all_results, save_path="network_activation.png"):
     return fig
 
 
-def plot_cohort_activation(all_results, save_path="network_cohorts.png"):
+def plot_cohort_activation(all_results, save_path=None):
     """Show which cohorts activate and when under each scenario."""
+    save_path = save_path or _fig("network_cohorts.png")
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 
     cohort_colors = {
@@ -482,11 +510,12 @@ def plot_cohort_activation(all_results, save_path="network_cohorts.png"):
     return fig
 
 
-def plot_resuppression_anatomy(all_results, save_path="network_resuppression.png"):
+def plot_resuppression_anatomy(all_results, save_path=None):
     """
     Show the anatomy of re-suppression: which nodes get burned and why.
     Compares the R_i distribution of suppressed vs surviving nodes.
     """
+    save_path = save_path or _fig("network_resuppression.png")
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 
     for ax, (label, (name, hist, color)) in zip(axes, all_results.items()):
@@ -784,8 +813,9 @@ def simulate_community(config, n_communities=5, k_intra=6, p_inter=0.02,
     return history
 
 
-def run_community_analysis(save_path="community_fragmentation.png"):
+def run_community_analysis(save_path=None):
     """Show how community structure amplifies bridge-node fragmentation."""
+    save_path = save_path or _fig("community_fragmentation.png")
     print("\n=== Community Structure Analysis ===")
 
     scenarios = {
@@ -974,7 +1004,8 @@ def simulate_partial_order(config, n_communities=5, phase_schedule=None,
                 if local_activation:
                     outreach_intensity = sig_fidelity * out_mode
                 else:
-                    outreach_intensity = 0.3 * cross_community_active / max(1, len(adj[node.id]))
+                    outreach_intensity = (config.leak_intensity * cross_community_active
+                                          / max(1, len(adj[node.id])))
 
                 suppress_strength = (config.resuppression_rate
                                      * node.R_i * node.B_i * outreach_intensity)
@@ -1043,7 +1074,7 @@ def simulate_partial_order(config, n_communities=5, phase_schedule=None,
     return history
 
 
-def run_partial_order_analysis(save_path="partial_order.png"):
+def run_partial_order_analysis(save_path=None):
     """
     Test whether partial-order strategies (phased by region) are safe.
 
@@ -1055,6 +1086,7 @@ def run_partial_order_analysis(save_path="partial_order.png"):
        are still reducing B_i — tests signal leakage
     4. Wrong uniform: activation everywhere at month 3, B_i at month 12
     """
+    save_path = save_path or _fig("partial_order.png")
     print("\n=== Partial-Order Regional Strategy Analysis ===")
 
     n_communities = 5

@@ -1,9 +1,9 @@
 {
 "$schema": "https://json-schema.org/draft/2020-12/schema",
-"$id": "infrastructure-stability-model/v1.0/measurement_protocol",
+"$id": "infrastructure-stability-model/v1.1/measurement_protocol",
 "title": "Infrastructure Stability Measurement Protocol",
 "description": "Field-deployable metrics for tracking system state. Prioritizes physical and behavioral signals over financial proxies. Addresses management signal lag (tau) by establishing short-latency physical reporting pathways.",
-"version": "1.0.0",
+"version": "1.1.0",
 
 "measurement_philosophy": {
 "core_problem": "Financial metrics are a high-pass filter on physical system state. Slow degradation — exactly what precedes nonlinear failure — is invisible until acute. tau_management_lag is not random noise; it is structural.",
@@ -11,6 +11,7 @@
 "signal_hierarchy": {
 "tier_1_physical": "Direct energy, material, labor flow measurements. Fastest time constant. Most accurate.",
 "tier_2_behavioral": "Field-observable behaviors: hazard detection rates, anomaly reporting, labor flow patterns.",
+"topological_blind_spot": "The tier hierarchy orders metrics by latency and filtering, and Phi sits at the top of it. Ledger F-002 and F-003 established that Phi does not see the damage done by wrong-order activation at all: aggregate labor improved while hub survival fell to 30pct and inter-community connectivity to 44pct. Scalar aggregates average over the network structure that carries the cascade. The two topological metrics on the early warning dashboard exist because no amount of improvement in tier-1 scalar measurement would have surfaced that failure.",
 "tier_3_proxy": "Financial and administrative metrics. Slowest, most filtered. Do not use as primary stability indicators."
 }
 },
@@ -163,6 +164,25 @@
 "frequency": "quarterly",
 "warning_threshold": "retirement_rate_exceeds_entry_rate",
 "alarm_threshold": "gap_widening_for_2_consecutive_quarters"
+},
+{
+"metric": "hub_node_retention_top_decile_peer_nominated",
+"frequency": "quarterly",
+"warning_threshold": "any_departure_from_top_decile_within_6_months_of_an_outreach_campaign",
+"alarm_threshold": ">30pct_of_top_decile_departed_or_disengaged_within_12_months",
+"tier": 2,
+"rationale": "Ledger F-003. Wrong-order activation is hub-destroying, not intervention-destroying: hub survival fell from 100pct to 30pct while aggregate labor still improved over no intervention. Phi cannot see this and neither can a headcount. Identify the top decile by peer nomination (see R_i_measurement.field_methods.peer_nomination), not by title or credential, and track them by name.",
+"ledger_ref": "F-003"
+},
+{
+"metric": "cross_group_referral_rate",
+"frequency": "quarterly",
+"warning_threshold": "declining_for_2_consecutive_quarters",
+"alarm_threshold": "<50pct_of_pre_campaign_baseline",
+"tier": 2,
+"rationale": "Ledger F-003. Bridge-node survival fell to 22pct and inter-community edges alive to 44pct under wrong-order activation, while all communities were still reached. The network stays connected enough to function and becomes too fragmented to propagate again. Referrals that cross crew, site, or community boundaries are the observable proxy for the edges that were lost.",
+"ledger_ref": "F-003",
+"measurement_note": "Count referrals whose source and target are in different crews, sites, or communities, as a fraction of all referrals. The absolute rate matters less than the trend against the pre-campaign baseline, so the baseline must be taken before outreach begins, not after."
 },
 {
 "metric": "precision_component_backlog_transformers_switchgear",
