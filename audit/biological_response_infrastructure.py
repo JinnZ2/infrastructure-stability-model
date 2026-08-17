@@ -35,6 +35,14 @@ are added to the filter set.
 
 License: CC0
 Stdlib only.
+
+Related modules:
+  - regulatory_scope_audit -- legal-epistemic layer enabling local response
+  - audit_authority_scope -- tier authority for post-hoc review
+  - corporate_charter_scope_audit -- charter-side of the response framework
+  - monte_carlo_resilience_sim -- stochastic validation
+  - failure_geometry_analysis -- biological vs comfort architecture
+
 """
 
 from dataclasses import dataclass, field

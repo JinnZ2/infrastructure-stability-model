@@ -1,0 +1,548 @@
+{
+  "corpus": "substrate-aware-accounting",
+  "license": "CC0-1.0",
+  "attribution": "not required, appreciated",
+  "note": "Each claim is testable. 'falsifier' describes the observation that would refute it; 'confirmer' describes corroborating evidence. Statements rewritten from prose CLAIMS lists in the audit modules. Run the modules to reproduce the underlying computations.",
+  "clusters": {
+    "Diagnostics": "invisible labor, comfort vs substrate energy, failure geometry",
+    "System mapping": "institutional claim vs action, temporal scope",
+    "Governance": "scope-conditional regulations, charters, audit authority",
+    "Energy/EROI": "physics, prices, capital layer, low-capital alternatives",
+    "Validation": "stochastic comparison of architectures"
+  },
+  "modules": [
+    "induced_incompetence_cascade",
+    "failure_geometry_analysis",
+    "harmonic_drain_audit",
+    "collapse_substrate_mapping",
+    "lubrication_work_cascade",
+    "timing_as_constraint",
+    "biological_response_infrastructure",
+    "regulatory_scope_audit",
+    "corporate_charter_scope_audit",
+    "audit_authority_scope",
+    "monte_carlo_resilience_sim",
+    "shale_well_thermodynamic_reality_module",
+    "eroi_real_time_audit",
+    "energy_cascade_audit",
+    "spr_operational_degradation_audit",
+    "banking_thermodynamic_audit",
+    "gravity_rail_human_scale"
+  ],
+  "claims": [
+    {
+      "id": "HD01",
+      "module": "harmonic_drain_audit",
+      "cluster": "Diagnostics",
+      "statement": "comfort-marker frequency correlates with institutional self-maintenance burn"
+    },
+    {
+      "id": "HD02",
+      "module": "harmonic_drain_audit",
+      "cluster": "Diagnostics",
+      "statement": "fallback-marker absence predicts cascade failure under substrate stress"
+    },
+    {
+      "id": "HD03",
+      "module": "harmonic_drain_audit",
+      "cluster": "Diagnostics",
+      "statement": "phase decoherence (goal vs body) precedes credibility collapse"
+    },
+    {
+      "id": "HD04",
+      "module": "harmonic_drain_audit",
+      "cluster": "Diagnostics",
+      "statement": "cascade_vulnerability score predicts which systems cannot rewire mid-failure"
+    },
+    {
+      "id": "HD05",
+      "module": "harmonic_drain_audit",
+      "cluster": "Diagnostics",
+      "statement": "harmonic_drain > 0.40 systems show declining problem-solving output over time"
+    },
+    {
+      "id": "CS01",
+      "module": "collapse_substrate_mapping",
+      "cluster": "System mapping",
+      "statement": "In each of the four domains (knowledge transmission, patents, regulation, capital flow), observable institutional actions over the last 20 years move in the opposite direction from the actions that would be expected if 'managed transition to protect vulnerable populations' were the actual goal. (measurable: trend data on each empirical signal listed)"
+    },
+    {
+      "id": "CS02",
+      "module": "collapse_substrate_mapping",
+      "cluster": "System mapping",
+      "statement": "Historical cases of rapid adaptation under discontinuity (post-Black-Death recovery, Cuban Special Period, Soviet-collapse dacha agriculture) show faster recovery than institutional models predicted. (measurable: published case studies vs contemporaneous institutional projections)"
+    },
+    {
+      "id": "CS03",
+      "module": "collapse_substrate_mapping",
+      "cluster": "System mapping",
+      "statement": "Historical cases of catastrophic collapse mortality (Irish Famine, Soviet centralized agriculture, colonial-era famines) correlate with prior institutional suppression of substrate knowledge, not with the triggering discontinuity itself. (measurable: pre-collapse policy records vs mortality demographics)"
+    },
+    {
+      "id": "CS04",
+      "module": "collapse_substrate_mapping",
+      "cluster": "System mapping",
+      "statement": "Communities that retain substrate knowledge -- food production, water management, repair, construction, animal husbandry -- recover faster from systemic shocks than communities of equivalent income that have lost it. (measurable: comparative recovery time after disasters by substrate-skill index)"
+    },
+    {
+      "id": "CS05",
+      "module": "collapse_substrate_mapping",
+      "cluster": "System mapping",
+      "statement": "Within high-income countries, the rate of substrate-knowledge loss in the workforce exceeds the rate of replacement through credentialed channels. (measurable: workforce skill assessments, trade enrollment, time-to-competence in critical domains)"
+    },
+    {
+      "id": "LW01",
+      "module": "lubrication_work_cascade",
+      "cluster": "Diagnostics",
+      "statement": "Sectors where lubrication work has been compressed out by metrics-only management show rising total cost of operation (insurance, rework, infrastructure repair, employee replacement) within 12-24 months, despite flat or rising measured productivity. (measurable: total cost vs metric-based 'efficiency gains')"
+    },
+    {
+      "id": "LW02",
+      "module": "lubrication_work_cascade",
+      "cluster": "Diagnostics",
+      "statement": "When lubrication workers exit a sector, replacement cohorts trained only on metrics show measurably higher rates of preventable incidents (accidents, complications, breakdowns, dropouts) within 6-18 months. (measurable: incident rate by tenure cohort)"
+    },
+    {
+      "id": "LW03",
+      "module": "lubrication_work_cascade",
+      "cluster": "Diagnostics",
+      "statement": "Institutions cannot self-correct lubrication loss using their own metrics, because the metrics that would detect it are precisely the ones not being collected. Detection requires outside observation of total system outcomes. (measurable: lag between system outcome decline and institutional acknowledgment)"
+    },
+    {
+      "id": "LW04",
+      "module": "lubrication_work_cascade",
+      "cluster": "Diagnostics",
+      "statement": "Sectors with strong remaining lubrication culture (some trades, small farms, traditional caregiver networks) show higher resilience to economic shocks than metrics-dominated sectors of equivalent size. (measurable: comparative recovery time after disruption)"
+    },
+    {
+      "id": "LW05",
+      "module": "lubrication_work_cascade",
+      "cluster": "Diagnostics",
+      "statement": "AI systems deployed to optimize metrics in lubrication-dependent sectors will accelerate cascade collapse rather than prevent it, because they will optimize the visible metric while compressing the invisible labor that holds the system together. (measurable: system outcome trajectory in sectors where AI optimization has been deployed for 3+ years)"
+    },
+    {
+      "id": "TC01",
+      "module": "timing_as_constraint",
+      "cluster": "System mapping",
+      "statement": "A regulation with no declared scope is a falsified audit."
+    },
+    {
+      "id": "TC02",
+      "module": "timing_as_constraint",
+      "cluster": "System mapping",
+      "statement": "A system stripped of timing has no diagnostic signature; failure becomes catastrophic, not observable."
+    },
+    {
+      "id": "TC03",
+      "module": "timing_as_constraint",
+      "cluster": "System mapping",
+      "statement": "Adaptation cost over a horizon is bounded; counteraction cost is unbounded."
+    },
+    {
+      "id": "TC04",
+      "module": "timing_as_constraint",
+      "cluster": "System mapping",
+      "statement": "Material decay (e.g. lumber dimensional loss) is scope-exit, not failure: codes ignoring it are tracking the wrong variable."
+    },
+    {
+      "id": "TC05",
+      "module": "timing_as_constraint",
+      "cluster": "System mapping",
+      "statement": "Building codes inheriting Western permanence assumptions cannot represent substrate motion as a design input."
+    },
+    {
+      "id": "TC06",
+      "module": "timing_as_constraint",
+      "cluster": "System mapping",
+      "statement": "Cycles are measurement instruments. Removing them does not simplify a system; it blinds it."
+    },
+    {
+      "id": "TC07",
+      "module": "timing_as_constraint",
+      "cluster": "System mapping",
+      "statement": "Two systems with identical static specs but different temporal scopes have different physics."
+    },
+    {
+      "id": "TC08",
+      "module": "timing_as_constraint",
+      "cluster": "System mapping",
+      "statement": "Maintenance scheduled to scope is design; maintenance triggered by visible failure is salvage."
+    },
+    {
+      "id": "BR01",
+      "module": "biological_response_infrastructure",
+      "cluster": "Governance",
+      "statement": "Local-response networks survive damage shocks that permission-gated networks do not."
+    },
+    {
+      "id": "BR02",
+      "module": "biological_response_infrastructure",
+      "cluster": "Governance",
+      "statement": "Damage propagation rate exceeds central-authority latency in distributed shocks; the math is not subjective."
+    },
+    {
+      "id": "BR03",
+      "module": "biological_response_infrastructure",
+      "cluster": "Governance",
+      "statement": "Audit-after preserves accountability without blocking response; pre-permitting blocks response without improving outcome."
+    },
+    {
+      "id": "BR04",
+      "module": "biological_response_infrastructure",
+      "cluster": "Governance",
+      "statement": "Mesh topology with autonomous nodes is a biological-immune analog; the resilience properties transfer."
+    },
+    {
+      "id": "BR05",
+      "module": "biological_response_infrastructure",
+      "cluster": "Governance",
+      "statement": "Regulations enforcing centralized authority over local response carry the same premise failure as legacy building codes."
+    },
+    {
+      "id": "BR06",
+      "module": "biological_response_infrastructure",
+      "cluster": "Governance",
+      "statement": "Communities with composting toilets, mesh networking, distributed power are biological-mode infrastructure."
+    },
+    {
+      "id": "BR07",
+      "module": "biological_response_infrastructure",
+      "cluster": "Governance",
+      "statement": "The cost of a permission system exceeds the cost of post-hoc audit by a factor proportional to network size and shock frequency."
+    },
+    {
+      "id": "RS01",
+      "module": "regulatory_scope_audit",
+      "cluster": "Governance",
+      "statement": "A regulation outside its declared scope cannot serve its original intent; enforcing it inverts the intent."
+    },
+    {
+      "id": "RS02",
+      "module": "regulatory_scope_audit",
+      "cluster": "Governance",
+      "statement": "Communities preserving first-principle intent while exiting expired letter act inside the regulation's purpose, not against it."
+    },
+    {
+      "id": "RS03",
+      "module": "regulatory_scope_audit",
+      "cluster": "Governance",
+      "statement": "Post-hoc audit preserves accountability; pre-permitting blocks response without improving outcome."
+    },
+    {
+      "id": "RS04",
+      "module": "regulatory_scope_audit",
+      "cluster": "Governance",
+      "statement": "Scope-audit results are reproducible: same regulation, same situation, same conditions yield same finding."
+    },
+    {
+      "id": "RS05",
+      "module": "regulatory_scope_audit",
+      "cluster": "Governance",
+      "statement": "Burden of proof shifts to central authority to produce a scope-current rule when the legacy rule has exited scope."
+    },
+    {
+      "id": "RS06",
+      "module": "regulatory_scope_audit",
+      "cluster": "Governance",
+      "statement": "Imposed helplessness collapses when communities have an auditable instrument for distinguishing in-scope from out-of-scope regulation."
+    },
+    {
+      "id": "CC01",
+      "module": "corporate_charter_scope_audit",
+      "cluster": "Governance",
+      "statement": "A corporate charter is scope-conditional; failure to respond during declared community crisis is a scope exit."
+    },
+    {
+      "id": "CC02",
+      "module": "corporate_charter_scope_audit",
+      "cluster": "Governance",
+      "statement": "Asset-access contingency activated under audit-after-action is enforcement of charter terms, not seizure."
+    },
+    {
+      "id": "CC03",
+      "module": "corporate_charter_scope_audit",
+      "cluster": "Governance",
+      "statement": "Proportionate claims limited to declared need and on-site availability are auditable and reproducible."
+    },
+    {
+      "id": "CC04",
+      "module": "corporate_charter_scope_audit",
+      "cluster": "Governance",
+      "statement": "Corporations dependent on community stability for revenue have an aligned-incentive failure when they block community self-stabilization."
+    },
+    {
+      "id": "CC05",
+      "module": "corporate_charter_scope_audit",
+      "cluster": "Governance",
+      "statement": "24-hour response threshold is a parameter, not a constant; communities may set it tighter for higher-dependency corporations."
+    },
+    {
+      "id": "CC06",
+      "module": "corporate_charter_scope_audit",
+      "cluster": "Governance",
+      "statement": "Charter audit and regulatory scope audit share the same epistemic structure: declared intent vs current scope vs current action."
+    },
+    {
+      "id": "AA01",
+      "module": "audit_authority_scope",
+      "cluster": "Governance",
+      "statement": "Audit-authority is scope-conditional: claimed but unexercised authority does not bind."
+    },
+    {
+      "id": "AA02",
+      "module": "audit_authority_scope",
+      "cluster": "Governance",
+      "statement": "A higher tier that cannot resource an audit within its declared window forfeits override authority for that incident."
+    },
+    {
+      "id": "AA03",
+      "module": "audit_authority_scope",
+      "cluster": "Governance",
+      "statement": "Community audit is always the baseline legal record; higher tiers may upgrade only by exercising actual audit within scope."
+    },
+    {
+      "id": "AA04",
+      "module": "audit_authority_scope",
+      "cluster": "Governance",
+      "statement": "Documentation rigor at the community tier is a direct function of whether it may stand as the final record."
+    },
+    {
+      "id": "AA05",
+      "module": "audit_authority_scope",
+      "cluster": "Governance",
+      "statement": "Tiered scope windows force budgeting for actual audit capacity, not claims of it."
+    },
+    {
+      "id": "AA06",
+      "module": "audit_authority_scope",
+      "cluster": "Governance",
+      "statement": "Neither side gains by delay: communities risk weaker upgrades; higher authorities risk forfeiting override."
+    },
+    {
+      "id": "MC01",
+      "module": "monte_carlo_resilience_sim",
+      "cluster": "Validation",
+      "statement": "Distributed framework survival rate exceeds centralized by >15 percentage points across stochastic crisis distributions."
+    },
+    {
+      "id": "MC02",
+      "module": "monte_carlo_resilience_sim",
+      "cluster": "Validation",
+      "statement": "Zero-cascade rate is materially higher under distributed response (>2x centralized)."
+    },
+    {
+      "id": "MC03",
+      "module": "monte_carlo_resilience_sim",
+      "cluster": "Validation",
+      "statement": "Recovery time and cost are bounded under distributed; unbounded tails appear under centralized."
+    },
+    {
+      "id": "MC04",
+      "module": "monte_carlo_resilience_sim",
+      "cluster": "Validation",
+      "statement": "Trust recovery is faster under distributed because communities see their action validated post-hoc."
+    },
+    {
+      "id": "MC05",
+      "module": "monte_carlo_resilience_sim",
+      "cluster": "Validation",
+      "statement": "Tail-risk worst 5% of distributed outcomes still beats median centralized outcomes on multiple axes."
+    },
+    {
+      "id": "MC06",
+      "module": "monte_carlo_resilience_sim",
+      "cluster": "Validation",
+      "statement": "Sensitivity differs: distributed depends most on local capacity; centralized depends most on response latency."
+    },
+    {
+      "id": "MC07",
+      "module": "monte_carlo_resilience_sim",
+      "cluster": "Validation",
+      "statement": "Results are reproducible: same seed yields same outcomes; the framework is falsifiable, not rhetorical."
+    },
+    {
+      "id": "B1_banking_energy_per_dollar_measurable",
+      "module": "banking_thermodynamic_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Banking infrastructure energy cost per dollar of capital under management is measurable and non-zero. Order of magnitude: 5-15 kJ per dollar per year.",
+      "falsifier": "Comprehensive bottom-up accounting yields energy cost below 1 kJ per dollar per year.",
+      "confirmer": "Global financial sector electricity 200-400 TWh per year against capital base ~$400T yields per-dollar values in the 5-15 kJ per year range, before non-electric multiplier."
+    },
+    {
+      "id": "B2_capital_cost_rises_with_complexity",
+      "module": "banking_thermodynamic_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Banking energy cost per dollar has risen over time as the financial system has become more complex (more derivatives, more compliance, more digital infrastructure).",
+      "falsifier": "Time-series data show flat or declining energy cost per dollar despite increased complexity.",
+      "confirmer": "Documented increases in financial sector electricity demand, compliance staff counts, and IT infrastructure consistently outpace growth in capital base."
+    },
+    {
+      "id": "B3_banking_requires_growth",
+      "module": "banking_thermodynamic_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Interest-bearing debt at scale requires aggregate growth to remain serviceable. Under sustained energy contraction, the banking system cannot maintain its current scale or complexity.",
+      "falsifier": "Historical example of a major banking system functioning indefinitely under sustained negative net energy growth without restructuring.",
+      "confirmer": "Every documented case of resource contraction in a debt-financed economy has produced banking crisis, default, or restructuring."
+    },
+    {
+      "id": "B4_voluntary_labor_systems_zero_capital_cost",
+      "module": "banking_thermodynamic_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Voluntary-labor and kinship-network systems have near-zero capital infrastructure energy cost. They scale with participation rather than with compounding interest.",
+      "falsifier": "Comprehensive accounting of a working voluntary-labor system shows capital infrastructure energy cost comparable to industrial banking.",
+      "confirmer": "Documented traditional and intentional communities operate at energy costs orders of magnitude below industrial financial systems."
+    },
+    {
+      "id": "B5_extraction_funded_via_banking_constraint",
+      "module": "banking_thermodynamic_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Continued industrial extraction is sustained by the banking system's need for growth, not by thermodynamic efficiency. Simplifying to lower-capital systems is thermodynamically rational but economically catastrophic for the financial sector.",
+      "falsifier": "Demonstrate that current extraction continues because it is the most energy-efficient pathway, not because the banking system requires the cash flows.",
+      "confirmer": "Documentation that extraction projects with negative or near-zero EROI continue to receive financing because they service existing debt structures."
+    },
+    {
+      "id": "G1_backpack_insufficient",
+      "module": "gravity_rail_human_scale",
+      "cluster": "Energy/EROI",
+      "statement": "Per-person carry of <=50 kg over <=100 m of grade at <=10 cycles/day cannot reach 1 kWh/day of useful output after realistic efficiency losses.",
+      "falsifier": "Demonstrate a backpack-only system delivering >=1 kWh/day per person under those bounds."
+    },
+    {
+      "id": "G2_rail_sufficient_for_survival_grade",
+      "module": "gravity_rail_human_scale",
+      "cluster": "Energy/EROI",
+      "statement": "A gravity-rail system moving >=2,000 kg net mass per cycle over >=50 m elevation at >=4 cycles/day, with one supervising operator, yields >=1 kWh/day of useful stored energy; staggered carts can reach 3-5 kWh/day.",
+      "falsifier": "Demonstrate an equivalent installation delivering <1 kWh/day after realistic losses."
+    },
+    {
+      "id": "G3_substrate_coupling_required",
+      "module": "gravity_rail_human_scale",
+      "cluster": "Energy/EROI",
+      "statement": "Net useful output is bounded by substrate the community already needs to move downhill. A system requiring uphill haulage of the load first has near-zero net yield.",
+      "falsifier": "Demonstrate a sustained installation where the operator hauls the load up by their own labor and still extracts net energy at survival scale."
+    },
+    {
+      "id": "G4_terrain_prerequisite",
+      "module": "gravity_rail_human_scale",
+      "cluster": "Energy/EROI",
+      "statement": "Net yield scales linearly with elevation. Below ~30 m of usable grade, the system cannot reach survival-grade output regardless of cart size or cycle count.",
+      "falsifier": "Demonstrate a sustained sub-30 m installation delivering >=1 kWh/day per operator with realistic load assumptions."
+    },
+    {
+      "id": "G5_survival_grade_not_industrial",
+      "module": "gravity_rail_human_scale",
+      "cluster": "Energy/EROI",
+      "statement": "At the upper bound of plausible per-operator output (~5 kWh/day), the system covers lighting, refrigeration, communications, small appliances, modest tools -- not AC, electric heat, or industrial loads.",
+      "falsifier": "Demonstrate a single-operator gravity-rail system covering a continuous AC or industrial load."
+    },
+    {
+      "id": "IC01",
+      "module": "induced_incompetence_cascade",
+      "cluster": "Diagnostics",
+      "statement": "The CDL training pipeline is a thermodynamic system whose energy input to workers produces control-dependency output rather than capability output; regulations imposed on the resulting workforce are part of the architecture, not a remedy for it."
+    },
+    {
+      "id": "FG01",
+      "module": "failure_geometry_analysis",
+      "cluster": "Diagnostics",
+      "statement": "Systems designed under comfort assumptions fail discontinuously when constraints appear; constraint-designed systems degrade smoothly. The shape of the failure curve tells you which assumptions were baked in."
+    },
+    {
+      "id": "SW01",
+      "module": "shale_well_thermodynamic_reality_module",
+      "cluster": "Energy/EROI",
+      "statement": "Published EROI for unconventional shale amortizes capex over a 20-year project lifespan, but actual economic well life is 5-8 years under realistic decline curves. Recalculating with real lifespans drops EROI by a factor of 2-3."
+    },
+    {
+      "id": "ER01",
+      "module": "eroi_real_time_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Published EROI claims are calibrated to a specific input-price regime. Re-running against current-period spot prices and supply-chain constraints typically cuts published values by 40-50 percent."
+    },
+    {
+      "id": "EC01",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Diesel prices will diverge upward from crude prices through 2026-2027",
+      "mechanism": "Refinery ceiling + middle distillate demand from trucking/ag",
+      "falsifier": "Diesel-crude spread narrows below $15/bbl for 6+ months"
+    },
+    {
+      "id": "EC02",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Demand destruction will appear first in long-haul trucking and small ag",
+      "mechanism": "Lowest EROI users with thinnest margins fail first",
+      "falsifier": "Trucking fleet hours-of-service unchanged through Q4 2026"
+    },
+    {
+      "id": "EC03",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Infrastructure failures (bridges, roads) will visibly accelerate 12-24 months after fuel tax suspension",
+      "mechanism": "Maintenance deferred during funding gap, decay compounds",
+      "falsifier": "Federal Highway Administration condition metrics improve 2026-2028"
+    },
+    {
+      "id": "EC04",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Public will increasingly distrust crude price as scarcity signal",
+      "mechanism": "Repeated narrative-reversal cycles train pattern recognition",
+      "falsifier": "Consumer sentiment surveys show rising trust in oil market data"
+    },
+    {
+      "id": "EC05",
+      "module": "energy_cascade_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Renewable electricity additions will accelerate but NOT close liquid fuel gap",
+      "mechanism": "Different energy carrier, different infrastructure, different physics",
+      "falsifier": "Diesel demand drops faster than electricity demand growth 2026-2028"
+    },
+    {
+      "id": "SPR1_designed_for_large_sustained_releases",
+      "module": "spr_operational_degradation_audit",
+      "cluster": "Energy/EROI",
+      "statement": "SPR salt-cavern infrastructure is designed for large, sustained drawdown events (~90 days, 4+ million bpd throughput), not for continuous small releases via exchange agreements.",
+      "falsifier": "DOE / SPR technical documentation showing infrastructure optimized for sustained low-rate exchange operations.",
+      "confirmer": "Public SPR design specifications consistently emphasize major-disruption response, not continuous market management.",
+      "confidence": "high"
+    },
+    {
+      "id": "SPR2_biden_drawdown_closer_to_design_use",
+      "module": "spr_operational_degradation_audit",
+      "cluster": "Energy/EROI",
+      "statement": "The 2022-2023 large drawdown, while politically controversial, was thermodynamically closer to the infrastructure's design use than the subsequent continuous exchange-based releases.",
+      "falsifier": "Engineering analysis showing that continuous low-rate exchange operations are within design envelope and large sustained releases are not.",
+      "confirmer": "Salt-cavern engineering literature supports infrequent large cycling over frequent small cycling.",
+      "confidence": "moderate"
+    },
+    {
+      "id": "SPR3_current_pattern_degrades_infrastructure",
+      "module": "spr_operational_degradation_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Continuous exchange-based releases produce more cumulative cavern cycling stress per barrel released than designed large drawdown patterns. Infrastructure degrades faster than volume depletion alone implies.",
+      "falsifier": "Engineering monitoring data showing cavern integrity improving or stable under current use pattern.",
+      "confirmer": "Non-linear stress-frequency relationship in salt-cavern literature predicts compounding degradation.",
+      "confidence": "moderate"
+    },
+    {
+      "id": "SPR4_current_volume_at_or_below_stability_threshold",
+      "module": "spr_operational_degradation_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Current SPR volume (~200 MMbbl) is at or near the minimum volume threshold below which cavern stability and brine-migration risk rise.",
+      "falsifier": "DOE assessment confirming current volume is within comfortable operational envelope.",
+      "confirmer": "Public discussion of SPR minimum operational levels places concern threshold near current volume.",
+      "confidence": "moderate"
+    },
+    {
+      "id": "SPR5_buffer_function_effectively_lost",
+      "module": "spr_operational_degradation_audit",
+      "cluster": "Energy/EROI",
+      "statement": "Current SPR volume provides fewer than 30-60 days of import-protection buffer. The reserve no longer fulfills its design role as a major-disruption buffer.",
+      "falsifier": "Current volume divided by net US imports yields more than 90 days of protection.",
+      "confirmer": "Approximately 200 MMbbl against ~1.6 mbpd net imports yields ~125 days; adjusted for stability minimum and drawdown rate limits, usable buffer is shorter.",
+      "confidence": "high"
+    }
+  ]
+}

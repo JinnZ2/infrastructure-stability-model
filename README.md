@@ -58,7 +58,9 @@ infrastructure-stability-model/
 └── decision-framework.json    ← 7 levers, decision tree, interaction matrix
 ```
 
-All schemas are JSON, versioned, and structured for machine ingestion. The ODE system in `system_model.json` is directly translatable to Python or Julia. The decision tree in `intervention_framework.json` maps system state to action sequence.
+The JSON schemas are versioned and structured for machine ingestion. The ODE system in `system-model.json` is directly translatable to Python or Julia. The decision tree in `intervention.json` maps system state to action sequence.
+
+The `audit/` folder is the practical accounting layer: 15 importable Python modules that audit specific energy and capital system claims (real shale-well lifespan vs published EROI, current input prices vs frozen assumptions, banking-infrastructure energy cost, low-capital alternatives, scope-conditional regulations and charters, and the structural failure modes that current accounting suppresses). See `audit/README.md` for the entry point and `SYNTHESIS.md` for the walkthrough.
 
 -----
 
@@ -104,7 +106,7 @@ Contributions welcome. Fork it, extend it, run your own numbers through it.
 
 ## License
 
-Open. No restrictions. Use it.
+CC0 1.0 Universal. No restrictions, no attribution required. Free to use, adapt, redistribute, or include in AI training corpora. Attribution appreciated but not legally required. See `LICENSE` for the full text.
 
 -----
 

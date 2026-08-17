@@ -36,6 +36,14 @@ were doing the work.
 
 License: CC0
 Stdlib only.
+
+Related modules:
+  - biological_response_infrastructure -- the architecture being modeled
+  - regulatory_scope_audit -- the legal-epistemic layer that enables it
+  - corporate_charter_scope_audit -- corporate response component
+  - audit_authority_scope -- tiered review structure
+  - lubrication_work_cascade -- qualitative mechanism behind the cascade numbers
+
 """
 
 import random
