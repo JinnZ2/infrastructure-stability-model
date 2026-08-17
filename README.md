@@ -51,21 +51,11 @@ Signal obstruction (B_i) must be reduced *before* activation outreach begins. If
 
 ```
 infrastructure-stability-model/
+├── index.json                 ← full model overview, extension roadmap
 ├── system-model.json          ← state variables, ODEs, parameters, constraints
 ├── node-detection.json        ← 7-step latent node identification and activation
 ├── measurement.json           ← physical metrics, early warning thresholds
-├── intervention.json          ← 7 levers, decision tree, interaction matrix
-├── decision-framework.json    ← integration of all of the above
-├── claims.json                ← machine-readable claim set for the in-repo audit corpus
-├── CLAIMS_UNIFIED.json        ← cross-repo claim set (this repo + earth-systems-physics + mathematics-economy)
-├── Claude_Code_Coordinator.py ← cross-repo query router; loads CLAIMS_UNIFIED.json
-├── SYNTHESIS.md               ← plain-language walkthrough of the audit toolkit
-├── CROSS_SUBSTRATE_EXPERIMENT.md  ← meta-document on the priming experiment this corpus is part of
-├── README.md                  ← this file
-├── LICENSE                    ← CC0 1.0 Universal
-└── audit/                     ← substrate-aware accounting toolkit (15 modules)
-    ├── README.md              ← entry point for the audit corpus
-    └── *.py                   ← stdlib-only Python, CC0, importable
+└── decision-framework.json    ← 7 levers, decision tree, interaction matrix
 ```
 
 The JSON schemas are versioned and structured for machine ingestion. The ODE system in `system-model.json` is directly translatable to Python or Julia. The decision tree in `intervention.json` maps system state to action sequence.
