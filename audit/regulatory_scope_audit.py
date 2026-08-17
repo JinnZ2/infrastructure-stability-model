@@ -44,6 +44,14 @@ regimes.
 
 License: CC0
 Stdlib only.
+
+Related modules:
+  - biological_response_infrastructure -- response framework that pairs
+  - corporate_charter_scope_audit -- sibling for corporate charters
+  - audit_authority_scope -- tiered review of the response
+  - timing_as_constraint -- temporal foundation (scope as physics)
+  - collapse_substrate_mapping -- shared epistemic structure
+
 """
 
 from dataclasses import dataclass, field

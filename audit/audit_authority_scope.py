@@ -36,6 +36,13 @@ tiered review structure.
 
 License: CC0
 Stdlib only.
+
+Related modules:
+  - regulatory_scope_audit -- feeds community-level audit records into tiered review
+  - corporate_charter_scope_audit -- same
+  - biological_response_infrastructure -- community baseline tier
+  - monte_carlo_resilience_sim -- stochastic validation
+
 """
 
 from dataclasses import dataclass, field

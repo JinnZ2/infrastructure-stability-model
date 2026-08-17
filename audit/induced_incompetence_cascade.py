@@ -17,6 +17,14 @@ This is not accident. This is architecture.
 Thermodynamically: energy input to system should produce CAPABILITY output.
 Instead it produces CONTROL-DEPENDENCY output. That's a lossy, parasitic
 transfer function.
+
+Related modules:
+  - lubrication_work_cascade -- invisible labor compressed out of the workforce, same mechanism at the role level
+  - harmonic_drain_audit -- substrate vs comfort energy allocation, scores the same pathology in text
+  - collapse_substrate_mapping -- claim vs action gap at the institutional level
+  - failure_geometry_analysis -- the cascade signature this pipeline produces
+  - regulatory_scope_audit -- the regulations imposed on the resulting workforce
+
 """
 
 from dataclasses import dataclass

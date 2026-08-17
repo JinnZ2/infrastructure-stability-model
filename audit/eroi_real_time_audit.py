@@ -15,6 +15,13 @@ provide a falsifiable, updateable harness so anyone running an EROI
 claim can be asked: which version of these inputs did you use?
 
 CC0. Standard library only.
+
+Related modules:
+  - shale_well_thermodynamic_reality_module -- physics layer of the same audit
+  - banking_thermodynamic_audit -- capital layer of the same audit
+  - timing_as_constraint -- temporal decay of frozen assumptions
+  - gravity_rail_human_scale -- low-capital alternative comparator
+
 """
 
 from dataclasses import dataclass, field

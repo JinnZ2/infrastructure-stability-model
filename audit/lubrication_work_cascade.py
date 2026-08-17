@@ -41,6 +41,14 @@ This module:
     8. Provides an integration hook for collapse_substrate_mapping
 
 CC0. Stdlib only.
+
+Related modules:
+  - collapse_substrate_mapping -- institutional macro pattern
+  - harmonic_drain_audit -- substrate vs comfort allocation scoring
+  - induced_incompetence_cascade -- worker exit case study
+  - monte_carlo_resilience_sim -- quantifies the cost of lubrication loss
+  - failure_geometry_analysis -- failure modes when this labor is absent
+
 """
 
 from dataclasses import dataclass, field
