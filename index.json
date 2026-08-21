@@ -1,20 +1,20 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "infrastructure-stability-model/v1.2/index",
+ "$id": "infrastructure-stability-model/v1.3/index",
  "title": "Infrastructure Stability Model — Schema Repository Index",
  "description": "Machine-readable formalization of a thermodynamic infrastructure stability framework. Covers energy-material-labor network dynamics, latent node detection and activation, and intervention sequencing for 3-5 year critical window. Includes runnable simulation engines and a falsification ledger recording which claims have been tested and what the tests did to them.",
- "version": "1.2.0",
+ "version": "1.3.0",
  "license": "CC0 1.0 Universal",
  "authors": [
   "Kavik",
   "Claude (Anthropic)"
  ],
  "created": "2026-02",
- "last_revised": "2026-08-15",
+ "last_revised": "2026-08-21",
  "theoretical_foundation": {
   "core_claim": "Civilization-scale infrastructure systems can be modeled as coupled energy-material-labor networks. The binding constraint is not material scarcity but energy quality, skilled labor bandwidth, and maintenance-to-surplus ratio. Financial signals are a high-pass filter on physical system state — degradation is systematically invisible until nonlinear failure threshold is crossed.",
   "key_variables": {
-   "Phi": "Maintenance burden ratio — primary stability metric. Phi = Em/(E*L_f). Bifurcation at Phi=1.0.",
+   "Phi": "Maintenance burden ratio. Phi = Em/(E*L_f). NOT a control parameter and NOT a bifurcation parameter — nothing in the implemented dynamics reads it (ledger F-014). It is also not a welfare ordering: a falling Phi can mean labor recovered or complexity was destroyed, so it must always be reported with its decomposition (ledger F-016).",
    "L_f_active": "Effective field labor bandwidth. Two channels: training (slow) and latent node recovery (fast).",
    "p_engage": "Latent node activation probability. Sticky prior from institutional rejection. Updates on demonstrated evidence, not promises.",
    "R_i": "Hazard recognition capacity. Propagates across trust network edges. Domain-portable.",
@@ -79,6 +79,31 @@
      "F-012"
     ],
     "conditional_on": "Complexity growth parameters a1 and a2 in sim/sim.py, which are uncalibrated. The decade-long window is an artifact of those values, not a prediction."
+   },
+   {
+    "insight": "Phi = 1.0 is not a bifurcation. Until 2026-08-21 the implemented ODEs had no state dependence in dC/dt, dL_training/dt or dkappa/dt — three of five state variables were straight ramps and Phi fed back into nothing, so the system could not bifurcate and no perturbation could propagate. State feedback has been added, off by default; threshold behavior remains undemonstrated.",
+    "evidence_status": "falsified",
+    "ledger_entries": [
+     "F-013",
+     "F-014"
+    ],
+    "superseded_wording": "Bifurcation at Phi=1.0. System drawing down reserves above the threshold; failure synchronization probability rises sharply."
+   },
+   {
+    "insight": "ENSO changes infrastructure risk through simultaneity, not frequency. Phi treats Em, E and L_f_active as independently perturbed; one ENSO event moves all three adversely in the same phase. Making the shock quasi-periodic instead of Poisson changes the 90th-percentile Phi by -6 percent; making it common-mode raises it 18 percent, and 35 percent at the 2-3 year period reported for extreme warming.",
+    "evidence_status": "untested",
+    "ledger_entries": [
+     "F-015"
+    ],
+    "note": "Channel coefficients are order-of-magnitude readings of the literature, taken from abstracts and summaries rather than full texts. No calibration against infrastructure data."
+   },
+   {
+    "insight": "A falling Phi does not mean recovery. Under sustained stress the maintenance-burden feedback sheds complexity the system can no longer maintain and the ratio improves because the numerator shrank — Phi falls from 1.268 to 1.143 with L_f_active unchanged and C down from 1.502 to 1.399. Recovery and managed collapse are indistinguishable in the scalar.",
+    "evidence_status": "falsified",
+    "ledger_entries": [
+     "F-016"
+    ],
+    "superseded_wording": "Phi < 0.7 stable surplus. Lower is better."
    }
   ]
  },
@@ -86,7 +111,7 @@
   "core_schemas": {
    "system_model": {
     "path": "system-model.json",
-    "description": "Core state variables, parameters, system constraints, intervention priority sequence.",
+    "description": "Core state variables, parameters, system constraints, intervention priority sequence. Includes a climate_forcing section modelling ENSO as a common-mode driver on Em, E and L_f_active.",
     "primary_use": "System parameterization and simulation initialization"
    },
    "node_detection_protocol": {
@@ -127,8 +152,8 @@
   "simulation": {
    "ode_engine": {
     "path": "sim/sim.py",
-    "description": "Mean-field ODE integration of the 5-variable coupled system. Four intervention scenarios, parameter sensitivity sweeps, temporal cohort handoff, stochastic shock Monte Carlo.",
-    "invocation": "python3 sim/sim.py [core|sweep|handoff|shocks|all] [--show]",
+    "description": "Mean-field ODE integration of the 5-variable coupled system. Four intervention scenarios, parameter sensitivity sweeps, temporal cohort handoff, stochastic shock Monte Carlo. Includes an ENSO common-mode factor ladder and an optional state-feedback closure (FEEDBACK_PARAMS, gains zero by default so prior results reproduce exactly).",
+    "invocation": "python3 sim/sim.py [core|sweep|handoff|shocks|enso|all] [--show]",
     "requires": [
      "numpy",
      "scipy",
@@ -175,6 +200,21 @@
   }
  },
  "extension_roadmap": [
+  {
+   "item": "bifurcation_sweep: does the model exhibit threshold behavior now that state feedback exists",
+   "status": "pending",
+   "rationale": "Ledger F-014. The entire threshold vocabulary of this model — cascade, synchronization, critical value 1.0 — depends on an answer nobody has produced. The gains were chosen for plausibility, not to produce a threshold."
+  },
+  {
+   "item": "regenerate_all_figures_at_nonzero_feedback_gain",
+   "status": "pending",
+   "rationale": "Ledger F-014. Every committed figure predates the feedback closure and shows the zero-gain limit."
+  },
+  {
+   "item": "capability_retention_metric_paired_with_Phi",
+   "status": "pending",
+   "rationale": "Ledger F-016. Without it, Phi can be improved by destroying the thing it is meant to protect."
+  },
   {
    "item": "simulation_engine: Python or Julia ODE system from schema parameters",
    "status": "delivered",
@@ -230,6 +270,16 @@
    "item": "tier_0_evidence_record_to_tier_2_consent: does a local evidence record raise the probability of the institutional ask succeeding",
    "status": "pending",
    "rationale": "The entire transition_layer general_pattern assumes it does. Nothing in the repository tests it. Ledger F-012 names this as the load-bearing untested assumption of the transition layer."
+  },
+  {
+   "item": "enso_channel_calibration_and_primary_source_verification",
+   "status": "pending",
+   "rationale": "Ledger F-015. The channel fractions are order-of-magnitude readings taken from search summaries; full texts were not retrievable from the authoring environment."
+  },
+  {
+   "item": "multi_region_teleconnection_coupling",
+   "status": "pending",
+   "rationale": "Ledger F-015. The model is single-region; ENSO teleconnections shift paired-region shock probability by 20-40 percent."
   }
  ],
  "how_to_use": {
@@ -240,7 +290,7 @@
  },
  "provenance": {
   "development_method": "Collaborative formalization from working conversation. Grounded in thermodynamic infrastructure analysis, complex systems theory (Tainter, West), and operational field knowledge of rural industrial labor systems.",
-  "validation_status": "Structurally simulated, empirically unparameterized. Both simulation engines and the transition module run, and their results are recorded in legacy/ledger.json. No parameter in any of them has been calibrated against field data. Three model claims have been falsified and rewritten by the model's own simulations, one confirmed against a strengthened test, and two checks have been found incapable of failing and replaced (F-004, F-011).",
+  "validation_status": "Structurally simulated, empirically unparameterized, and now known to have been structurally incomplete for its first five months. Three of five state variables had no feedback until 2026-08-21, which means the Phi=1.0 bifurcation was never a property of the implemented model and the stochastic shock analysis produced exactly zero variance (ledger F-013, F-014). Feedback has been added with gains defaulting to zero, so every prior result reproduces exactly and the difference is inspectable. Six claims have been falsified by the model's own runs, two revised, one confirmed against a strengthened test, and three checks have been found incapable of failing and replaced (F-004, F-011, F-013). No parameter anywhere has been calibrated against field data.",
   "note": "This model was developed and distributed using its own principles: lateral network delivery, open access, no institutional gatekeeping."
  }
 }

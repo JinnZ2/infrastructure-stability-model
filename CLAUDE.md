@@ -15,6 +15,7 @@ It is a specification layer (JSON schemas) plus two runnable simulation engines,
 ```
 ├── README.md                 # Project overview and entry point
 ├── METHOD.md                 # Falsification protocol — read before changing any claim
+├── SOURCES.md                # External literature and what was actually read of it
 ├── LICENSE                   # CC0 1.0 Universal
 ├── requirements.txt          # numpy, scipy, matplotlib (sim/ only)
 ├── validate.py               # Enforces this file's rules — run before committing
@@ -66,6 +67,7 @@ Non-negotiable rules:
 No build system, no test suite, no linter.
 
 - **Validate before committing any schema or ledger change: `python3 validate.py`** (add `--full` to also run every audit module). It enforces the rules in this file — JSON parses, no smart quotes, ledger entries complete and in-vocabulary with a named unknown, referenced paths exist.
+- `sim/sim.py` state-feedback gains default to zero, which reproduces every pre-2026-08-21 result exactly. `FEEDBACK_PARAMS` switches them on. Do not change the defaults without regenerating every figure and saying so (ledger `F-014`).
 - Run the sims: `python3 sim/sim.py all` and `python3 sim/network_sim.py all`. Both write to `figures/` regardless of working directory. `sim/sim.py all` takes several minutes.
 - Run the transition module: `python3 sim/transition.py all`. Stdlib-only by design so it works without an install step — `validate.py` fails the build if a third-party import appears at module level. Its `verify` mode needs numpy/scipy and degrades with a message without them.
 - Run any audit module directly: `python3 audit/<module>.py`. All are stdlib-only and take no arguments. All 13 currently execute cleanly.
@@ -98,6 +100,9 @@ Each core JSON schema follows this structure:
 - Maintain semantic consistency of parameter names across files.
 - Update `companion_schemas` arrays and the `repository_map` in `index.json` when adding, moving, or renaming files. Path claims drift like any other claim (ledger `F-007`).
 - Preserve the measurement tier hierarchy: tier-1 physical > tier-2 behavioral > tier-3 financial.
+- **Phi is not a control parameter and not a welfare ordering.** Nothing in the dynamics reads it, so do not call it a bifurcation parameter (ledger `F-014`), and never report it without its decomposition — it falls both when labor recovers and when complexity is destroyed (ledger `F-016`).
+- Climate drivers are **common-mode**: ENSO moves Em, E and L_f_active adversely in the same phase. Do not model them as independent channel perturbations, and do not assess exposure as a system mean — global aggregates cancel it (ledger `F-015`).
+- Any external number added to a schema gets an entry in `SOURCES.md` saying what was actually read.
 - Levers carry an `authority_tier` as well as an impact rating. Do not rank levers for a reader without saying whose consent each one needs (ledger `F-009`). Report the top three as a **set**, never as an ordering — the ordering does not survive perturbation of its own inputs (ledger `F-010`).
 - **Before reporting that a check passed, construct the input that should make it fail and confirm it does.** This repo has now shipped two checks that could not fail: the partial-order schedule (`F-004`) and a sensitivity sweep written in full knowledge of it (`F-011`).
 - Signal obstruction (B_i) must be reduced before activation outreach **in the same locality** — the constraint is local, not global (ledger `F-004`). Do not restate it as an aggregate-labor or Phi claim; it is topological (ledger `F-002`, `F-003`).

@@ -1,9 +1,9 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "infrastructure-stability-model/v1.2/legacy-ledger",
+ "$id": "infrastructure-stability-model/v1.3/legacy-ledger",
  "title": "Falsification Ledger",
  "description": "Record of every claim in this repository that has been tested, and what the test did to it. Append-only. Entries are never edited after resolution except to add a rerun result or a follow-on entry id. See METHOD.md for the protocol and the verdict vocabulary.",
- "version": "1.2.0",
+ "version": "1.3.0",
  "license": "CC0 1.0 Universal",
  "maintained_under": "METHOD.md",
  "verdict_vocabulary": {
@@ -252,17 +252,101 @@
    "artifact": null,
    "precedent_retained": "Levers that add labor bandwidth do not hold their gain against an untouched complexity ratchet. Any claim that a tier-0 path is sufficient must state its horizon, because within this model it is not sufficient at 120 months.",
    "rerun": null
+  },
+  {
+   "id": "F-013",
+   "date_opened": "2026-08-21",
+   "date_resolved": "2026-08-21",
+   "subject": "run_stochastic_shocks measures the effect of disruptions on Phi",
+   "hypothesis": "The Monte Carlo shock mode perturbs the system with Poisson-distributed disruptions and shows how intervention margin determines resilience to them. The stochastic_shocks figure shows the resulting spread.",
+   "test": "Replicated the committed inner loop directly, 30 runs under the baseline policy, then ran a deliberate extreme: eight maximum-magnitude shocks against zero shocks, printed at full float precision.",
+   "result": "Zero variance. Across 30 runs drawing 1 to 7 shocks each, Phi at 120 months was 1.4509 in every run, identical to the unshocked baseline. The extreme comparison is bit-identical: eight maximum shocks give Phi = 1.450920280040, no shocks give Phi = 1.450920280040, difference exactly 0.000e+00. The shocks are inert. The committed figure shows three flat bands with no spread and has done since it was generated.",
+   "verdict": "falsified",
+   "claim_before": "Monte Carlo with Poisson-distributed disruption events, comparing resilience at two margin levels.",
+   "claim_after": "The shock mode as committed cannot show shock impact. It perturbs a local copy of the state inside the right-hand-side evaluation only, so the perturbation reaches the derivative and never the integrated trajectory — and, per F-014, the derivative does not depend on the perturbed variables anyway. Retained and marked rather than removed, because the figure is in the record and the defect is the finding.",
+   "unknowns_opened": [
+    "How many other figures in this repository show a null result that was read as a signal",
+    "Whether a shock that does perturb the integrated state produces a spread worth reporting, once state feedback exists (rungs A-C of the ENSO ladder now do show one)",
+    "Why this was not caught when the figure was generated — the three panels are visibly identical flat lines"
+   ],
+   "artifact": null,
+   "precedent_retained": "This is the third check in this repository found incapable of producing the failure it was checking for, after F-004 and F-011. Two of the three were written after the rule about constructing the failing input was documented. Treat a clean pass with zero variance as a defect report until proven otherwise.",
+   "rerun": "The ENSO factor ladder in sim/sim.py run_enso_comparison, which includes the committed assumption set as rung A precisely so the null is visible next to alternatives that are not null."
+  },
+  {
+   "id": "F-014",
+   "date_opened": "2026-08-21",
+   "date_resolved": "2026-08-21",
+   "subject": "Phi = 1.0 is a bifurcation of the model",
+   "hypothesis": "Phi is the control parameter of a dynamic system with a bifurcation at Phi = 1.0. Above it the system draws down reserves and failure synchronization probability rises sharply.",
+   "test": "Perturbed each state variable by 50 percent in turn and recorded which derivatives changed, at the nominal operating point with no interventions.",
+   "result": "Perturbing C changes nothing. Perturbing L_training changes nothing. Perturbing kappa changes nothing. Only p_engage and prior_dismissal have any effect, and only on dp_engage/dt. Reading the equations confirms it: dC/dt = a1*Y_bias - a2*S_weight, dL_training/dt = -b1*epsilon - b2*I + b3*T_rate, and dkappa/dt = c1*optimization_pressure - c2*decentralization_policy are all functions of parameters alone. Three of the five state variables were straight ramps whose slopes changed only when an intervention ramped. Phi was computed from the state and fed back into nothing.",
+   "verdict": "falsified",
+   "claim_before": "Bifurcation at Phi=1.0. Control parameter Phi, critical value 1.0. System drawing down reserves above the threshold; failure synchronization probability rises sharply.",
+   "claim_after": "There is no bifurcation in the implemented model, because there is no feedback. A bifurcation requires the state to influence its own evolution across a threshold; Phi influenced nothing. The threshold values 0.7 and 1.0 are interpretive bands on a diagnostic readout, not dynamical features, and no run has ever demonstrated threshold behavior. State feedback has now been added (three gains, zero by default so the legacy behavior is the zero-gain limit and every prior result reproduces exactly) and the bifurcation has still not been demonstrated — it is now merely possible rather than excluded.",
+   "unknowns_opened": [
+    "Whether the model bifurcates at all once feedback is present, and at what value if so. The gains were chosen for plausibility, not to produce a threshold, and no sweep has been run",
+    "Whether the four headline scenarios survive feedback. Direction is preserved (baseline 1.451 -> 1.288, correct sequence 0.307 -> 0.297, ordering unchanged) but the numbers move and every figure in the repository was generated at zero gain",
+    "Whether the three feedback terms are the right ones. Tainter's argument requires maintenance burden to constrain complexity, which is now present; the mentor-capacity and stress-ratchet terms are weaker inferences",
+    "How a model with no feedback produced results that looked plausible for five months, and what that implies about reading simulation output for plausibility"
+   ],
+   "artifact": null,
+   "precedent_retained": "A ratio computed from state variables is not a control parameter unless something reads it. Before calling any quantity in this model a control parameter, check that a derivative depends on it. The whole class of claims about cascade, synchronization and threshold behavior requires feedback that did not exist.",
+   "rerun": "Feedback added and the four scenarios rerun at both zero and nonzero gain; ordering preserved. The bifurcation sweep itself is not yet run and is listed in the roadmap."
+  },
+  {
+   "id": "F-015",
+   "date_opened": "2026-08-21",
+   "date_resolved": "2026-08-21",
+   "subject": "Whether ENSO changes infrastructure risk through shock frequency or through common-mode simultaneity",
+   "hypothesis": "The 2026 ENSO literature invalidates the shock model's independence assumptions. Three candidates: arrivals are quasi-periodic rather than Poisson, recovery takes years rather than months, and a single event drives maintenance demand, energy throughput and labor bandwidth at once. Testing which of the three carries the risk.",
+   "test": "python3 sim/sim.py enso. Factor ladder, each rung changing exactly one assumption from the rung above, 60 runs per rung under the baseline policy with state feedback on. Rung A is the committed assumption set. E uses the 2-3 year period reported for extreme warming.",
+   "result": "Arrival statistics barely matter and persistence alone does not raise risk. Quasi-periodic arrivals (rung C) give a 90th-percentile Phi of 0.94x the committed model; multi-year persistence alone (rung B) gives 0.96x and actually lowers median Phi. Common mode is what carries the risk: acting on Em, E and L_f in the same phase (rung D) gives 1.18x, and doing so on the extreme-warming 2.5-year period (rung E) gives 1.35x, with worst-case Phi reaching 2.15 against the committed model's 1.29. Without feedback the same ladder gives 1.00x, 1.00x, 1.29x and 1.54x, with rungs A through C showing literally zero variance (F-013).",
+   "verdict": "untested",
+   "claim_before": null,
+   "claim_after": "Within this model, ENSO changes infrastructure risk through simultaneity rather than frequency. Phi = Em/(E*L_f_active) treats its three physical terms as independently perturbed; a single ENSO event moves all three adversely in the same phase, so numerator and denominator work against each other at once. Getting each channel estimate more accurate does not recover this — the coupling is the effect. Verdict untested because every channel coefficient is an order-of-magnitude reading, not a calibration.",
+   "unknowns_opened": [
+    "Em_surge 0.25, E_deficit 0.08 and L_deficit 0.06 are order-of-magnitude readings of the literature, not fits to any infrastructure dataset. The 1.18x and 1.35x figures scale with them",
+    "The sources were read as search summaries and abstracts. Full texts were not retrievable from this environment, so the coefficients rest on secondary reporting and none of the numbers has been checked against a primary table",
+    "Whether the three channels are in phase in reality or merely in the same year. The model puts them exactly in phase, which is the strongest form of the assumption",
+    "Whether teleconnection correlation across regions compounds this further. The 20-40 percent shift in paired-breadbasket shock probability suggests the spatial correlation is large, and this model is single-region",
+    "Whether the shortened extreme-warming period should be paired with the reduced amplitude the same study reports. Rung E shortens the period and holds amplitude, which is the pessimistic half of a non-monotonic result"
+   ],
+   "artifact": null,
+   "precedent_retained": "Common-mode drivers cannot be represented by improving independent channel estimates. Any future shock model in this repository must state whether its channels are independent and defend it.",
+   "rerun": null
+  },
+  {
+   "id": "F-016",
+   "date_opened": "2026-08-21",
+   "date_resolved": "2026-08-21",
+   "subject": "A falling Phi means the system is recovering",
+   "hypothesis": "Phi is the stability metric; interventions that lower it are working. Lower Phi is better.",
+   "test": "Decomposed Phi into C and L_f_active at 120 months across the ENSO ladder, 20 runs per rung, feedback on.",
+   "result": "Rung B lowers Phi from 1.268 to 1.143 relative to rung A while L_f_active is unchanged at 0.442 and C falls from 1.502 to 1.399. The improvement is entirely complexity destruction: under sustained stress the maintenance-burden feedback sheds capability the system can no longer maintain, and the ratio improves because the numerator shrank. Rung E is the reverse case, with C falling furthest to 1.336 and L_f_active also falling to 0.422 while Phi still rises to 1.394 — capability lost and burden ratio worse at the same time.",
+   "verdict": "falsified",
+   "claim_before": "Phi < 0.7 stable surplus, 0.7-1.0 marginal, Phi >= 1.0 structural decay. Lower is better.",
+   "claim_after": "Phi is a ratio and cannot distinguish recovery from managed collapse. A falling Phi means either that labor bandwidth recovered or that complexity was destroyed, and those are opposite outcomes. Phi must be reported with its decomposition — Em, E, L_f_active and C — never alone. The bands remain useful as a burden reading and are not a welfare ordering.",
+   "unknowns_opened": [
+    "What the right paired metric is. Capability retained per unit of Phi improvement is the obvious candidate and is not defined anywhere in the schemas",
+    "Whether any real intervention in the decision framework lowers Phi through complexity shedding rather than labor recovery. L5, the complexity growth throttle, is the obvious suspect and has never been examined this way",
+    "Whether the historical cases the model is grounded in — Tainter's collapses — are the shedding branch or the recovery branch, which would change what the model is claiming about them"
+   ],
+   "artifact": null,
+   "precedent_retained": "This is the third form of the same failure in this repository. Aggregate labor hid hub destruction (F-003), Phi hid the sequencing damage (F-002), and now Phi hides the difference between recovery and capability loss. A scalar summary of a structured system hides structure by construction; the question is only which structure. The ENSO literature contains the identical lesson independently: hydropower anomalies are individually significant at more than a third of dams and cancel to approximately zero in the global aggregate.",
+   "rerun": null
   }
  ],
  "open_unknowns_summary": {
   "description": "Unknowns from unresolved entries, and the ones most worth attacking next. Derived from the entries above; not authoritative on its own.",
   "highest_value": [
+   "Whether the model bifurcates at all now that feedback exists, and at what value (F-014) — the entire threshold vocabulary of this repository depends on an answer nobody has produced",
+   "Regeneration of every figure at nonzero feedback gain (F-014) — all committed figures predate the feedback closure",
+   "A paired capability metric so Phi cannot be improved by destroying complexity (F-016)",
+   "Calibration of the three ENSO channel coefficients against infrastructure data, and verification against primary sources rather than search summaries (F-015)",
    "Field measurement of trust-network topology and the R_i-to-degree correlation (F-003) — the hub argument rests entirely on it",
-   "Whether a tier-0 evidence record raises the probability of a subsequent tier-2 ask succeeding (F-012) — the entire transition sequencing rests on this and nothing tests it",
-   "A second-campaign run through a hub-depleted network (F-003) — this is where the wrong-order cost is claimed to land, and it has never been simulated",
-   "Calibration of the complexity growth parameters a1 and a2 (F-012) — they set how long a tier-0 path holds, and the answer is currently an artifact",
-   "Empirical bound on leak_intensity (F-004) — the partial-order safety result is conditional on it",
-   "Recovery of audit_substrate / audit_vestibular (F-005), or an explicit decision to respecify the bus against the 13 modules present"
+   "Whether a tier-0 evidence record raises the probability of a subsequent tier-2 ask succeeding (F-012)",
+   "Multi-region ENSO teleconnection coupling (F-015) — the model is single-region and the spatial correlation is reported as large"
   ]
  },
  "metadata": {

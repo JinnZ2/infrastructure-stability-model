@@ -9,7 +9,8 @@ Usage:
   python3 sim/sim.py                # run core 4-scenario comparison
   python3 sim/sim.py sweep          # parameter sensitivity analysis
   python3 sim/sim.py handoff        # temporal cohort handoff visualization
-  python3 sim/sim.py shocks         # stochastic disruption Monte Carlo
+  python3 sim/sim.py shocks         # stochastic disruption Monte Carlo (see F-013)
+  python3 sim/sim.py enso           # ENSO common-mode forcing vs the Poisson assumption
   python3 sim/sim.py all            # run everything
   python3 sim/sim.py --show         # also display interactive plots (with any mode)
 
@@ -21,7 +22,7 @@ License: CC0 1.0 Universal
 
 import os
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Callable, Optional
 
 import numpy as np
@@ -90,10 +91,51 @@ PARAMS = {
     "B_i": 0.6,               # signal obstruction factor
     "epsilon": 0.35,          # labor exclusion coefficient
 
+    # Climate common-mode multiplier on effective labor bandwidth.
+    # 1.0 = no climate forcing, which is the default and reproduces every
+    # result committed before the ENSO layer existed. Driven by ENSOForcing
+    # when one is supplied. See ledger F-013.
+    "L_climate_mult": 1.0,
+
     # Re-suppression penalty
     "suppression_penalty_rate": 4.0,  # rate of prior_dismissal damage
     "B_i_activation_threshold": 0.3,  # B_i above this during outreach causes damage
+
+    # --- State feedback gains (ledger F-014) --------------------------------
+    # Zero by default. At zero these terms vanish and the model reproduces
+    # every result committed before 2026-08-21 exactly, which is why the
+    # legacy behavior is the zero-gain limit rather than a separate code path.
+    #
+    # They are zero because the original ODEs had no state dependence at all:
+    # dC/dt, dL_training/dt and dkappa/dt were functions of parameters only,
+    # so C, L_training and kappa were straight ramps, Phi was a readout that
+    # fed back into nothing, and no perturbation to those variables could
+    # propagate. Use FEEDBACK_PARAMS to switch them on.
+    "a3_phi_complexity": 0.0,     # Phi above threshold constrains complexity growth
+    "b4_mentor_capacity": 0.0,    # training throughput limited by experienced staff
+    "c3_phi_coupling": 0.0,       # Phi above threshold ratchets coupling tighter
+    "phi_feedback_threshold": 0.70,  # marginal regime boundary
+    "L_f_reference": 0.85,        # L_f_active at which mentor capacity is nominal
 }
+
+
+# Feedback-enabled parameter set. Gains are asserted, not calibrated — they set
+# the strength of three mechanisms, not their existence:
+#
+#   a3  Tainter. Maintenance burden constrains further complexity: past the
+#       marginal threshold you cannot commission what you cannot maintain, and
+#       past 1.0 things fail and are not replaced.
+#   b4  Mentor capacity. Training throughput is bounded by how many experienced
+#       people are available to teach, which is L_f_active. This is the same
+#       claim the L2 lever makes about older nodes as mentor hubs.
+#   c3  Stress ratchet. Under maintenance stress, operators defer redundancy
+#       and tighten coupling to hold service, which raises kappa.
+FEEDBACK_PARAMS = dict(PARAMS)
+FEEDBACK_PARAMS.update({
+    "a3_phi_complexity": 0.06,
+    "b4_mentor_capacity": 1.0,
+    "c3_phi_coupling": 0.03,
+})
 
 # State: [C, L_training, p_engage, kappa, prior_dismissal]
 INITIAL_STATE = np.array([
@@ -147,14 +189,155 @@ class Intervention:
         return base_value + frac * (self.target - base_value)
 
 
-def get_effective_params(t_years, base_params, interventions):
-    """Apply active interventions to get effective parameter values at time t."""
+def get_effective_params(t_years, base_params, interventions, forcing=None):
+    """
+    Apply active interventions, then climate forcing, to get effective
+    parameter values at time t.
+
+    Order matters: interventions are decisions, forcing is weather. A lever
+    that targets B_i=0.15 sets B_i to 0.15 whatever the climate is doing; the
+    climate then scales the physical terms on top of that. Reversing the order
+    would let a drought undo a policy, which is not what either represents.
+    """
     t_months = t_years * 12.0
     params = dict(base_params)
     for iv in interventions:
         base_val = base_params[iv.param]
         params[iv.param] = iv.get_value(t_months, base_val)
+    if forcing is not None:
+        params = forcing.apply(params, t_months)
     return params
+
+
+# ---------------------------------------------------------------------------
+# Climate common-mode forcing (ENSO)
+# ---------------------------------------------------------------------------
+#
+# Added 2026-08-21. See ledger F-013, F-014, F-015.
+#
+# The committed shock model (run_stochastic_shocks) draws disruptions from a
+# Poisson process, recovers in 3 months, and perturbs only complexity and the
+# training labor channel. Every one of those three choices is contradicted by
+# the ENSO literature:
+#
+#   independence   ENSO is quasi-periodic, not memoryless. Events recur on a
+#                  2-7 year cycle, and teleconnections correlate their impacts
+#                  across widely separated regions in the same year.
+#
+#   recovery time  Callahan & Mankin (Science, 2023) find country-level growth
+#                  depressed for at least five years after an event, with a
+#                  tail out to fourteen. A 3-month recovery is off by more than
+#                  an order of magnitude, and it guarantees the system returns
+#                  to baseline between events.
+#
+#   single channel ENSO is a COMMON-MODE driver. It raises maintenance demand
+#                  (damage), lowers primary energy throughput (irradiance and
+#                  hydrological deficits), and lowers effective labor (heat
+#                  stress on outdoor work) in the same phase. Phi = Em/(E*L_f)
+#                  is therefore hit in numerator and denominator at once.
+#
+# Every coefficient below is a rough order-of-magnitude reading of that
+# literature, not a calibration. They are exposed so they can be argued with.
+
+@dataclass
+class ENSOForcing:
+    """
+    A common-mode climate driver acting on Em, E, and L_f together.
+
+    Set common_mode=False and recovery_years=0 with quasi_periodic=False to
+    recover the behavior of the committed Poisson shock model; that
+    equivalence is checked explicitly in run_enso_comparison.
+    """
+
+    # --- arrival structure ---
+    quasi_periodic: bool = True
+    period_years: float = 4.0       # ENSO recurrence. 2-7yr observed; ~4 typical.
+    period_jitter: float = 0.9      # sd in years. Quasi-periodic, not clockwork.
+    rate_per_year: float = 0.4      # used only when quasi_periodic is False
+
+    # --- event shape ---
+    event_width_months: float = 9.0   # duration of the peak phase
+    amplitude_lo: float = 0.5         # event-to-event strength spread
+    amplitude_hi: float = 1.5
+
+    # --- persistence after the event ---
+    recovery_years: float = 5.0     # Callahan & Mankin: >=5yr depressed growth
+    residual_fraction: float = 0.35  # share of peak impact that persists and decays
+
+    # --- channels (fractional impact at unit amplitude, at peak) ---
+    common_mode: bool = True
+    Em_surge: float = 0.25          # maintenance demand up
+    E_deficit: float = 0.08         # primary energy throughput down
+    L_deficit: float = 0.06         # effective labor bandwidth down
+    C_bump: float = 0.30            # complexity spike, as in the committed model
+    L_training_loss: float = 0.15   # training-channel loss, as in the committed model
+
+    # populated by schedule()
+    times: tuple = ()
+    magnitudes: tuple = ()
+
+    def schedule(self, t_months_total, rng):
+        """Draw an arrival schedule. Returns a new forcing with times filled in."""
+        if self.quasi_periodic:
+            times, t = [], rng.uniform(0.0, self.period_years) * 12.0
+            while t < t_months_total:
+                times.append(t)
+                gap = max(1.0, rng.normal(self.period_years, self.period_jitter))
+                t += gap * 12.0
+        else:
+            n = rng.poisson(self.rate_per_year * (t_months_total / 12.0))
+            times = sorted(rng.uniform(0, t_months_total, n))
+
+        mags = rng.uniform(self.amplitude_lo, self.amplitude_hi, len(times))
+        return replace(self, times=tuple(times), magnitudes=tuple(mags))
+
+    def intensity(self, t_months):
+        """
+        Total forcing intensity at time t: the superposition of every event's
+        peak phase and its decaying residual.
+
+        The residual is what makes recovery time matter. With recovery_years
+        at 5 and a period of 4, a new event arrives before the previous one
+        has decayed, so intensity accumulates instead of resetting.
+        """
+        total = 0.0
+        for start, mag in zip(self.times, self.magnitudes):
+            elapsed = t_months - start
+            if elapsed < 0:
+                continue
+            if elapsed < self.event_width_months:
+                # peak phase: half-sine, so the forcing is continuous at both
+                # ends and the stiff solver does not have to chase a step
+                frac = elapsed / self.event_width_months
+                total += mag * np.sin(np.pi * frac)
+            elif self.recovery_years > 0:
+                # persistent drag, exponential decay over the recovery timescale
+                tau = self.recovery_years * 12.0
+                total += mag * self.residual_fraction * np.exp(
+                    -(elapsed - self.event_width_months) / tau)
+        return total
+
+    def apply(self, params, t_months):
+        """Return params with the common-mode channels scaled by intensity."""
+        x = self.intensity(t_months)
+        if x <= 0.0:
+            return params
+        out = dict(params)
+        if self.common_mode:
+            out["alpha"] = params["alpha"] * (1.0 + self.Em_surge * x)
+            out["E"] = params["E"] * max(0.05, 1.0 - self.E_deficit * x)
+            out["L_climate_mult"] = params["L_climate_mult"] * max(
+                0.05, 1.0 - self.L_deficit * x)
+        return out
+
+    def state_perturbation(self, t_months):
+        """
+        Direct perturbation of C and L_training, matching the channels the
+        committed Poisson model used. Kept separate from apply() so the two
+        mechanisms can be enabled independently.
+        """
+        x = self.intensity(t_months)
+        return self.C_bump * x, max(0.05, 1.0 - self.L_training_loss * x)
 
 
 # ---------------------------------------------------------------------------
@@ -172,7 +355,7 @@ def _soft_clamp_derivative(val, dval, lo, hi, margin=0.05):
     return dval
 
 
-def ode_system(t, y, base_params, interventions):
+def ode_system(t, y, base_params, interventions, forcing=None):
     """
     5-variable coupled ODE system.
 
@@ -196,25 +379,40 @@ def ode_system(t, y, base_params, interventions):
     beta_eff = p["beta0"] + p["gamma"] * kappa
     Em = p["alpha"] * C ** beta_eff
     L_latent_recovered = p["L_latent"] * p_engage * (1.0 - p["B_i"])
-    L_f_active = max(0.01, L_training * (1.0 - p["epsilon"]) + L_latent_recovered)
+    L_f_active = max(0.01, (L_training * (1.0 - p["epsilon"]) + L_latent_recovered)
+                     * p["L_climate_mult"])
     Phi = Em / (p["E"] * L_f_active)
 
     # --- Derivatives ---
 
-    # dC/dt: complexity dynamics
-    dC = p["a1"] * p["Y_bias"] - p["a2"] * p["S_weight"]
+    # Excess maintenance burden above the marginal threshold. This is the
+    # single quantity that carries state back into the dynamics; with the
+    # gains at zero it multiplies nothing and the system is a set of ramps.
+    phi_excess = max(0.0, Phi - p["phi_feedback_threshold"])
 
-    # dL_training/dt: training labor pipeline
-    dL_training = -p["b1"] * p["epsilon"] - p["b2"] * p["I"] + p["b3"] * p["T_rate"]
+    # dC/dt: complexity dynamics, constrained by maintenance burden
+    dC = (p["a1"] * p["Y_bias"] - p["a2"] * p["S_weight"]
+          - p["a3_phi_complexity"] * phi_excess * C)
+
+    # dL_training/dt: training labor pipeline, throughput bounded by the
+    # experienced staff available to teach
+    mentor_capacity = 1.0
+    if p["b4_mentor_capacity"] > 0.0:
+        ratio = L_f_active / max(1e-6, p["L_f_reference"])
+        mentor_capacity = 1.0 + p["b4_mentor_capacity"] * (ratio - 1.0)
+        mentor_capacity = float(np.clip(mentor_capacity, 0.0, 3.0))
+    dL_training = (-p["b1"] * p["epsilon"] - p["b2"] * p["I"]
+                   + p["b3"] * p["T_rate"] * mentor_capacity)
 
     # dp_engage/dt: engagement probability (Bayesian-like update)
     signal_eff = p["signal_fidelity"] * (1.0 + p["outreach_mode"] * p["gamma_t"] * p["k_avg"])
     dp_engage = (signal_eff * (1.0 - p_engage) / prior_dismissal_state
                  - p["decay_rate"] * p_engage * p["I"])
 
-    # dkappa/dt: coupling dynamics (ratchet character)
+    # dkappa/dt: coupling dynamics (ratchet character), tightened by stress
     dkappa = (p["c1"] * p["optimization_pressure"]
-              - p["c2"] * p["decentralization_policy"])
+              - p["c2"] * p["decentralization_policy"]
+              + p["c3_phi_coupling"] * phi_excess)
 
     # Re-suppression mechanics — the core sequencing constraint.
     # When outreach is active AND B_i is still high:
@@ -241,7 +439,7 @@ def ode_system(t, y, base_params, interventions):
     return derivs
 
 
-def compute_derived(t_array, y_array, base_params, interventions):
+def compute_derived(t_array, y_array, base_params, interventions, forcing=None):
     """Post-process ODE solution to compute Phi, Em, L_f_active, F, beta_eff."""
     n = len(t_array)
     result = {
@@ -259,12 +457,13 @@ def compute_derived(t_array, y_array, base_params, interventions):
         p_engage = y_array[2, i]
         kappa = y_array[3, i]
 
-        p = get_effective_params(t, base_params, interventions)
+        p = get_effective_params(t, base_params, interventions, forcing)
 
         beta_eff = p["beta0"] + p["gamma"] * kappa
         Em = p["alpha"] * C ** beta_eff
         L_latent_recovered = p["L_latent"] * p_engage * (1.0 - p["B_i"])
-        L_f_active = max(0.01, L_training * (1.0 - p["epsilon"]) + L_latent_recovered)
+        L_f_active = max(0.01, (L_training * (1.0 - p["epsilon"]) + L_latent_recovered)
+                         * p["L_climate_mult"])
         Phi = Em / (p["E"] * L_f_active)
         F = kappa * Phi
 
@@ -281,7 +480,8 @@ def compute_derived(t_array, y_array, base_params, interventions):
 # Scenario runner
 # ---------------------------------------------------------------------------
 
-def run_scenario(name, interventions, t_months=120, params=None, y0=None):
+def run_scenario(name, interventions, t_months=120, params=None, y0=None,
+                 forcing=None):
     """Run a single scenario and return results dict."""
     if params is None:
         params = dict(PARAMS)
@@ -301,7 +501,7 @@ def run_scenario(name, interventions, t_months=120, params=None, y0=None):
         y0,
         method="Radau",
         t_eval=t_eval,
-        args=(params, interventions),
+        args=(params, interventions, forcing),
         rtol=1e-6,
         atol=1e-8,
         max_step=0.05,
@@ -310,7 +510,7 @@ def run_scenario(name, interventions, t_months=120, params=None, y0=None):
     if not sol.success:
         print(f"Warning: solver failed for scenario '{name}': {sol.message}")
 
-    derived = compute_derived(sol.t, sol.y, params, interventions)
+    derived = compute_derived(sol.t, sol.y, params, interventions, forcing)
 
     return {
         "name": name,
@@ -938,6 +1138,173 @@ def run_stochastic_shocks(save_path=None, n_runs=50, seed=42):
 # Main
 # ---------------------------------------------------------------------------
 
+# ===========================================================================
+# EXTENSION 4: ENSO common-mode forcing vs the Poisson shock assumption
+# ===========================================================================
+
+# Named configurations, each isolating one assumption in the committed shock
+# model, so the difference can be attributed rather than just observed.
+def _enso_ladder():
+    """
+    Factor ladder. Each rung changes exactly one thing from the rung above.
+
+    A is the committed model's assumption set expressed in ENSOForcing terms.
+    E and F are the two ENSO periodicities from the 2026 npj Climate and
+    Atmospheric Science non-monotonic result: ~4 years under moderate warming,
+    shortening to 2-3 years under extreme warming.
+    """
+    poisson_like = dict(
+        quasi_periodic=False, recovery_years=0.0, common_mode=False,
+        event_width_months=3.0, residual_fraction=0.0,
+    )
+    return [
+        ("A. Poisson, 3mo recovery, single channel (committed)",
+         ENSOForcing(**poisson_like), "#555555"),
+        ("B. + multi-year persistence (Callahan-Mankin 5yr)",
+         ENSOForcing(**{**poisson_like, "recovery_years": 5.0,
+                        "residual_fraction": 0.35}), "#1f77b4"),
+        ("C. + quasi-periodic arrivals (4yr ENSO cycle)",
+         ENSOForcing(**{**poisson_like, "recovery_years": 5.0,
+                        "residual_fraction": 0.35, "quasi_periodic": True,
+                        "period_years": 4.0, "event_width_months": 9.0}),
+         "#ff7f0e"),
+        ("D. + common mode on Em, E and L_f together",
+         ENSOForcing(quasi_periodic=True, period_years=4.0,
+                     recovery_years=5.0, common_mode=True), "#d62728"),
+        ("E. D with 2.5yr period (extreme-warming ENSO)",
+         ENSOForcing(quasi_periodic=True, period_years=2.5, period_jitter=0.5,
+                     recovery_years=5.0, common_mode=True), "#8c564b"),
+    ]
+
+
+def run_enso_comparison(save_path=None, n_runs=60, seed=7, t_months_total=120,
+                        params=None, policy="correct"):
+    """
+    Does the Poisson independence assumption understate risk, and if so, which
+    part of it is responsible?
+
+    Runs the factor ladder under the correct-sequence intervention set, so any
+    difference is attributable to the shock structure rather than to the
+    policy. Reports median and 90th-percentile Phi at 120 months and the
+    fraction of runs that finish above the Phi=1.0 cascade threshold.
+    """
+    save_path = save_path or _fig("enso_common_mode.png")
+    params = dict(FEEDBACK_PARAMS if params is None else params)
+    fb = "feedback on" if params["a3_phi_complexity"] else "feedback OFF (legacy)"
+    print(f"\n=== ENSO Common-Mode Forcing ({n_runs} runs per rung, "
+          f"{policy} policy, {fb}) ===")
+
+    t_span = (0.0, t_months_total / 12.0)
+    n_eval = 400
+    t_eval = np.linspace(t_span[0], t_span[1], n_eval)
+
+    def correct_sequence():
+        return [
+            Intervention("B_i", target=0.15, ramp_months=6, start_month=0),
+            Intervention("signal_fidelity", target=0.70, ramp_months=3, start_month=6),
+            Intervention("outreach_mode", target=0.80, ramp_months=3, start_month=6),
+            Intervention("Y_bias", target=0.4, ramp_months=3, start_month=6),
+            Intervention("S_weight", target=0.7, ramp_months=3, start_month=6),
+            Intervention("epsilon", target=0.15, ramp_months=6, start_month=12),
+            Intervention("decentralization_policy", target=0.06,
+                         ramp_months=12, start_month=18),
+        ]
+
+    ladder = _enso_ladder()
+    results = {}
+    make_ivs = correct_sequence if policy == "correct" else (lambda: [])
+
+    for label, template, color in ladder:
+        phi_runs = np.zeros((n_runs, n_eval))
+        for run in range(n_runs):
+            # Same seed sequence per rung, so the arrival draws are comparable
+            rng = np.random.default_rng(seed + run)
+            forcing = template.schedule(t_months_total, rng)
+            ivs = make_ivs()
+
+            def rhs(t, y, prm, interventions, frc):
+                C_bump, L_mult = frc.state_perturbation(t * 12.0)
+                y_mod = list(y)
+                y_mod[0] = y[0] + C_bump
+                y_mod[1] = y[1] * L_mult
+                return ode_system(t, y_mod, prm, interventions, frc)
+
+            sol = solve_ivp(rhs, t_span, INITIAL_STATE.copy(), method="Radau",
+                            t_eval=t_eval, args=(dict(params), ivs, forcing),
+                            rtol=1e-6, atol=1e-8, max_step=0.05)
+            derived = compute_derived(sol.t, sol.y, dict(params), ivs, forcing)
+            phi_runs[run, :] = derived["Phi"]
+
+        final = phi_runs[:, -1]
+        results[label] = {
+            "phi": phi_runs, "color": color,
+            "median": float(np.median(final)),
+            "p90": float(np.percentile(final, 90)),
+            "worst": float(np.max(final)),
+            "frac_cascade": float(np.mean(final >= 1.0)),
+            "frac_marginal": float(np.mean(final >= 0.7)),
+        }
+
+    print(f"\n{'rung':<52}{'med':>7}{'p90':>7}{'max':>7}{'>=0.7':>7}{'>=1.0':>7}")
+    print("-" * 87)
+    for label, r in results.items():
+        print(f"{label:<52}{r['median']:>7.3f}{r['p90']:>7.3f}{r['worst']:>7.3f}"
+              f"{r['frac_marginal']:>7.0%}{r['frac_cascade']:>7.0%}")
+
+    base = results[ladder[0][0]]
+    for label, r in list(results.items())[1:]:
+        ratio = r["p90"] / base["p90"] if base["p90"] else float("nan")
+        print(f"  {label[:3]} p90 is {ratio:.2f}x the committed model's")
+
+    _plot_enso(results, save_path)
+    return results
+
+
+def _plot_enso(results, save_path):
+    fig = plt.figure(figsize=(16, 9))
+    gs = gridspec.GridSpec(2, 2, hspace=0.32, wspace=0.24)
+
+    ax = fig.add_subplot(gs[0, :])
+    for label, r in results.items():
+        phi = r["phi"]
+        t = np.linspace(0, phi.shape[1], phi.shape[1]) / phi.shape[1] * 120
+        med = np.median(phi, axis=0)
+        ax.plot(t, med, color=r["color"], linewidth=2, label=label)
+        ax.fill_between(t, np.percentile(phi, 10, axis=0),
+                        np.percentile(phi, 90, axis=0),
+                        color=r["color"], alpha=0.10)
+    ax.axhline(1.0, color="#d62728", linestyle="--", linewidth=1)
+    ax.axhline(0.7, color="#ff7f0e", linestyle=":", linewidth=1)
+    ax.set_title("Phi under the same intervention, different shock structure "
+                 "(median, 10-90 band)", fontsize=11)
+    ax.set_xlabel("Months"); ax.set_ylabel("Phi")
+    ax.legend(fontsize=7, loc="upper left"); ax.grid(True, alpha=0.3)
+
+    ax = fig.add_subplot(gs[1, 0])
+    labels = list(results)
+    ax.barh(range(len(labels)), [results[l]["p90"] for l in labels],
+            color=[results[l]["color"] for l in labels])
+    ax.axvline(1.0, color="#d62728", linestyle="--", linewidth=1)
+    ax.set_yticks(range(len(labels)))
+    ax.set_yticklabels([l[:2] for l in labels], fontsize=9)
+    ax.invert_yaxis()
+    ax.set_title("Phi at 120 months, 90th percentile", fontsize=10)
+    ax.grid(True, alpha=0.3, axis="x")
+
+    ax = fig.add_subplot(gs[1, 1])
+    ax.barh(range(len(labels)), [results[l]["frac_cascade"] for l in labels],
+            color=[results[l]["color"] for l in labels])
+    ax.set_yticks(range(len(labels)))
+    ax.set_yticklabels([l[:2] for l in labels], fontsize=9)
+    ax.invert_yaxis()
+    ax.set_title("Fraction of runs finishing at or above Phi=1.0", fontsize=10)
+    ax.grid(True, alpha=0.3, axis="x")
+
+    fig.savefig(save_path, dpi=110, bbox_inches="tight")
+    print(f"Saved: {save_path}")
+    return fig
+
+
 def run_core_scenarios(show=False):
     """Run the original 4-scenario comparison."""
     scenarios = make_scenarios()
@@ -980,10 +1347,13 @@ def main():
         run_handoff_analysis()
     if mode in ("shocks", "all"):
         run_stochastic_shocks()
+    if mode in ("enso", "all"):
+        run_enso_comparison(policy="baseline")
 
-    if mode not in ("core", "sweep", "handoff", "shocks", "all"):
+    if mode not in ("core", "sweep", "handoff", "shocks", "enso", "all"):
         print(f"Unknown mode: {mode}")
-        print("Usage: python3 sim.py [core|sweep|handoff|shocks|all] [--show]")
+        print("Usage: python3 sim/sim.py "
+              "[core|sweep|handoff|shocks|enso|all] [--show]")
         sys.exit(1)
 
     if show:
