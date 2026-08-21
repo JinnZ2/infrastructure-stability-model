@@ -11,7 +11,7 @@
 "signal_hierarchy": {
 "tier_1_physical": "Direct energy, material, labor flow measurements. Fastest time constant. Most accurate.",
 "tier_2_behavioral": "Field-observable behaviors: hazard detection rates, anomaly reporting, labor flow patterns.",
-"topological_blind_spot": "The tier hierarchy orders metrics by latency and filtering, and Phi sits at the top of it. Ledger F-002 and F-003 established that Phi does not see the damage done by wrong-order activation at all: aggregate labor improved while hub survival fell to 30pct and inter-community connectivity to 44pct. Scalar aggregates average over the network structure that carries the cascade. The two topological metrics on the early warning dashboard exist because no amount of improvement in tier-1 scalar measurement would have surfaced that failure.",
+"topological_blind_spot": "The tier hierarchy orders metrics by latency and filtering, and Phi sits at the top of it. Ledger F-002 and F-003 established that Phi does not see the damage done by wrong-order activation at all: aggregate labor improved while hub survival fell to 30pct and inter-community connectivity to 44pct. Scalar aggregates average over the network structure that carries the cascade. The two topological metrics on the early warning dashboard exist because no amount of improvement in tier-1 scalar measurement would have surfaced that failure. The same argument applies to common-mode climate drivers: ENSO moves Em, E and L_f_active adversely in the same phase, so improving the accuracy of each channel separately cannot recover a coupling that lives between them (ledger F-015). And Phi itself cannot distinguish recovery from capability loss, so it must always be reported with its decomposition (ledger F-016).",
 "tier_3_proxy": "Financial and administrative metrics. Slowest, most filtered. Do not use as primary stability indicators."
 }
 },
@@ -164,6 +164,36 @@
 "frequency": "quarterly",
 "warning_threshold": "retirement_rate_exceeds_entry_rate",
 "alarm_threshold": "gap_widening_for_2_consecutive_quarters"
+},
+{
+"metric": "enso_phase_and_forecast_lead",
+"frequency": "monthly",
+"warning_threshold": "Nino3.4 anomaly above +0.5C with a coupled atmospheric response, or any official El Nino advisory",
+"alarm_threshold": "Nino3.4 anomaly above +2.0C, or a second event arriving within 3 years of the previous one",
+"tier": 1,
+"rationale": "Ledger F-015. ENSO is the only common-mode driver in this protocol with a usable forecast lead. It moves Em, E and L_f_active adversely in the same phase, so it is the one early-warning signal that predicts simultaneous movement in all three terms of Phi rather than in one.",
+"ledger_ref": "F-015",
+"measurement_note": "Tier 1 because it is a direct physical observation with short reporting latency, not because the model has calibrated its effect. Lead time is the point: it is the only entry on this dashboard that gives months of warning rather than reporting a change after it happened. Treat the lead as shrinking for Central Pacific events, which become both more common and less predictable under warming."
+},
+{
+"metric": "phi_decomposition_not_phi_alone",
+"frequency": "monthly",
+"warning_threshold": "Phi falling while C is also falling — the burden ratio improving through capability loss",
+"alarm_threshold": "C falling and L_f_active falling in the same reporting period, regardless of what Phi does",
+"tier": 1,
+"rationale": "Ledger F-016. Phi is a ratio and cannot distinguish recovery from managed collapse. Under sustained stress the simulated system sheds complexity it can no longer maintain, and Phi improves because the numerator shrank. Reporting Phi alone shows that as success.",
+"ledger_ref": "F-016",
+"measurement_note": "Report Em, E, L_f_active and C as four separate series alongside Phi. A dashboard that plots Phi as a single line is not implementing this protocol. The direction of C is what separates the two ways Phi can fall."
+},
+{
+"metric": "common_mode_exposure_by_locality",
+"frequency": "annual",
+"warning_threshold": "any locality where maintenance demand, primary energy supply and outdoor labor availability share a dominant climate driver",
+"alarm_threshold": "that locality also carries a high-kappa interface",
+"tier": 2,
+"rationale": "Ledger F-015. The point of a common-mode audit is to find the places where the three terms of Phi are not independent. Independent channel estimates cannot recover this, however accurate each one is.",
+"ledger_ref": "F-015",
+"measurement_note": "Assess per locality and never as a system mean. Global aggregates cancel this signal: hydropower production anomalies are individually significant at more than a third of dams and sum to a weak, statistically insignificant net global anomaly. A system average of ENSO exposure reads as approximately zero while the regions carrying the infrastructure are individually stressed."
 },
 {
 "metric": "hub_node_retention_top_decile_peer_nominated",

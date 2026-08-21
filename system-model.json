@@ -204,8 +204,38 @@
 "control_parameter": "Phi",
 "critical_value": 1.0,
 "high_sensitivity_region": [0.7, 1.0],
+"status": "hypothesized",
+"status_note": "This was asserted as a property of the model and is not one. Until 2026-08-21 the implemented ODEs had no state dependence in dC/dt, dL_training/dt or dkappa/dt: those three variables were straight ramps, Phi was a diagnostic readout, and nothing carried Phi back into the dynamics. A bifurcation requires the state to influence its own evolution across a threshold, so the implemented system could not have one, and no run has ever demonstrated it. State feedback has since been added (sim/sim.py FEEDBACK_PARAMS, off by default) and the threshold behavior has still not been demonstrated. See ledger F-014.",
 "description": "In high-sensitivity region, small parameter changes produce large outcome differences. This region is dangerous precisely because it does not appear as crisis in abstracted financial metrics. Management signal lag tau filters degradation below quarterly reporting threshold.",
-"tau_asymmetry": "Financial signals amplify upside faster than they signal degradation. tau is a high-pass filter on growth signals, low-pass on decay. Slow degradation — exactly the kind that precedes nonlinear failure — is systematically invisible until acute."
+"tau_asymmetry": "Financial signals amplify upside faster than they signal degradation. tau is a high-pass filter on growth signals, low-pass on decay. Slow degradation — exactly the kind that precedes nonlinear failure — is systematically invisible until acute.",
+"phi_is_not_sufficient": "Phi is a ratio, and a falling Phi does not mean the system is recovering. Under sustained common-mode climate stress the complexity feedback sheds C faster than L_f recovers: Phi falls because capability is being destroyed, not because burden is being met. Rung B of the ENSO ladder shows exactly this — Phi drops from 1.268 to 1.143 while L_f_active is unchanged at 0.442 and C falls from 1.502 to 1.399. Report the decomposition (Em, E, L_f_active, C) alongside Phi, never Phi alone. See ledger F-016."
+},
+
+"climate_forcing": {
+"description": "ENSO as a common-mode driver on the physical terms of Phi. Added 2026-08-21 after the 2026 El Nino literature made the independence assumptions in the shock model untenable. See ledger F-013 through F-016.",
+"why_this_layer_exists": "Phi = Em/(E*L_f_active) treats its three physical terms as independently perturbed. ENSO does not perturb them independently: a single event raises maintenance demand through storm, flood and heat damage, lowers primary energy throughput through irradiance and hydrological deficits, and lowers effective labor bandwidth through heat stress on outdoor work — in the same phase, in the same year. Numerator and denominator move against each other simultaneously. That is a common mode, and no amount of accuracy in the individual channel estimates recovers it.",
+
+"driver_properties": {
+"recurrence_years": [2, 7],
+"typical_period_years": 4,
+"period_under_extreme_warming_years": [2, 3],
+"period_note": "A 2026 study in npj Climate and Atmospheric Science reports a non-monotonic response of ENSO to warming: under moderate warming the oscillation strengthens with persistent positive skewness and roughly 4-year periodicity; under extreme warming amplitude and skewness decline while the period shortens to 2-3 years and Central Pacific events are favored.",
+"arrival_statistics": "Quasi-periodic, not Poisson. The events are not independent draws and their impacts are spatially correlated through teleconnections.",
+"spatial_correlation": "Teleconnections couple impacts across widely separated regions in the same year. ENSO, the Indian Ocean Dipole and the North Atlantic Oscillation have shifted the relative probability of simultaneous yield shocks in pairs of breadbaskets by 20-40 percent for maize and wheat. The same mechanism that correlates crop failures correlates infrastructure stress.",
+"persistence_years": [5, 14],
+"persistence_note": "Callahan and Mankin (Science, 2023) find country-level growth depressed for at least five years after an event, with a tail out to fourteen, and attribute 4.1 and 5.7 trillion USD in global income losses to the 1982-83 and 1997-98 events. This is the load-bearing number for this model: the recovery time exceeds the recurrence interval, so the system does not return to baseline between events. Stress accumulates rather than resolving.",
+"predictability_note": "Central Pacific ENSO becomes less predictable under greenhouse warming as the spring predictability barrier strengthens — and extreme warming favors exactly those Central Pacific events. Forecast lead time therefore shrinks for the event type that becomes more common. Recent deep-learning approaches report skillful prediction to 16 months when initialized in spring, so the direction of this is contested and it is recorded as an open question, not a result."
+},
+
+"channels": {
+"Em_surge": {"symbol": "Em", "direction": "increase", "fraction_at_peak": 0.25, "mechanism": "storm, flood and heat damage raising maintenance energy demand", "evidence": "The 1997-98 event is associated with roughly 36 billion USD in infrastructure damage.", "status": "order_of_magnitude"},
+"E_deficit": {"symbol": "E", "direction": "decrease", "fraction_at_peak": 0.08, "mechanism": "surface irradiance and hydrological deficits reducing primary energy throughput", "evidence": "El Nino reduces surface solar irradiance with sustained deficits in California, the southern Atacama, the Chaco Basin, the Middle East and East China; solar radiation varies by more than 10 percent in some locations in winter. More than a third of simulated dams show statistically significant annual energy production anomalies in at least one ENSO phase.", "status": "order_of_magnitude"},
+"L_deficit": {"symbol": "L_f_active", "direction": "decrease", "fraction_at_peak": 0.06, "mechanism": "heat stress on outdoor and physical maintenance work", "evidence": "The ILO projects 2.2 percent of global working hours lost to heat by 2030, concentrated in agriculture and construction; vulnerable regions see far larger reductions in labor-intensive outdoor activity. El Nino years are the warmest years.", "status": "order_of_magnitude"}
+},
+
+"aggregation_warning": "Global aggregates cancel this signal. Hydropower anomalies are individually significant at more than a third of dams and sum to a weak, statistically insignificant net global anomaly. A system-level average of ENSO exposure will therefore read as approximately zero while the regions that carry the infrastructure are individually stressed. This is the same failure mode the model already recorded twice in a different domain: aggregate labor hid the hub destruction in ledger F-003, and Phi hid it in F-002. Measure ENSO exposure per locality, never as a system mean.",
+
+"model_status": "The channel fractions above are order-of-magnitude readings of the cited literature, not calibrations, and the citations were read as abstracts and summaries rather than full texts. No parameter here has been fitted to observed infrastructure data. Verdict untested; see ledger F-015."
 },
 
 "intervention_priority_sequence": {

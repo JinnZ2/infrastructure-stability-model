@@ -30,6 +30,8 @@ Where:
 
 The dangerous zone is the middle one. It doesn't look like a crisis from abstracted financial reporting. By the time Phi appears in quarterly metrics, correction cost has multiplied.
 
+**Two caveats that the model's own runs forced.** Phi is not a bifurcation parameter — nothing in the implemented dynamics reads it, and the threshold at 1.0 is an interpretive band, not a demonstrated dynamical feature (ledger `F-014`). And Phi is not a welfare ordering: it falls when labour recovers *and* when complexity is destroyed, which are opposite outcomes, so it must always be reported alongside E_m, E, L_f_active and C (ledger `F-016`).
+
 -----
 
 ## Key insight this model formalizes
@@ -60,6 +62,69 @@ Both engines run. Their results are recorded in [`legacy/ledger.json`](legacy/le
 **The constraint is local, not global.** Regionally phased rollouts are safe: a region can begin activation while its neighbours are still reducing B_i, as long as each region's own B_i is down before its own outreach. The committed test for this did not actually test it — its schedule started B_i reduction everywhere at month 0, so no region was ever unprepared when leakage arrived. Rerunning with regions genuinely held at high B_i gives the same result, and a sweep of the leakage-intensity parameter puts the failure boundary above 4x its assumed value, which is stronger than a directly addressed signal. Safe within any regime where leaked signal is weaker than direct contact. (Ledger `F-004`.)
 
 Figures for all of it are in [`figures/`](figures/).
+
+-----
+
+## What El Nino does to this model
+
+Incorporating the 2026 ENSO literature ([`SOURCES.md`](SOURCES.md)) broke
+three things, one of them load-bearing.
+
+**The shock model could not show a shock.** `run_stochastic_shocks` draws
+Poisson disruptions and reports the spread. There is no spread. Across 30 runs
+drawing 1 to 7 shocks each, Phi at 120 months was 1.4509 every time — and
+eight maximum-magnitude shocks are *bit-identical* to no shocks at all,
+difference exactly 0.000e+00. The committed figure shows three flat lines.
+(Ledger `F-013`.)
+
+**The reason is that there was no feedback.** `dC/dt`, `dL_training/dt` and
+`dkappa/dt` were functions of parameters only. Perturb C: nothing changes.
+Perturb L_training: nothing changes. Perturb kappa: nothing changes. Three of
+five state variables were straight ramps, and Phi was a readout that fed back
+into nothing. **So there was no bifurcation at Phi = 1.0**, because a
+bifurcation needs the state to influence its own evolution across a threshold.
+That claim had been on the front of this repo since February and was never a
+property of the model. State feedback has now been added — three gains,
+defaulting to zero so every prior result reproduces exactly — and the
+threshold behaviour is still undemonstrated, merely no longer impossible.
+(Ledger `F-014`.)
+
+**What ENSO actually changes is simultaneity, not frequency.** Running a
+factor ladder where each rung alters one assumption:
+
+| rung | change | p90 Phi vs committed |
+|---|---|---|
+| A | Poisson, 3-month recovery, single channel | baseline |
+| B | + multi-year persistence (Callahan & Mankin, 5yr) | 0.96x |
+| C | + quasi-periodic arrivals (4yr ENSO cycle) | 0.94x |
+| D | + common mode on Em, E and L_f together | **1.18x** |
+| E | D at the 2-3yr extreme-warming period | **1.35x** |
+
+Making arrivals quasi-periodic instead of Poisson does essentially nothing.
+Adding multi-year persistence on its own does nothing. What matters is that a
+single ENSO event raises maintenance demand, lowers primary energy throughput,
+and lowers effective labour bandwidth **in the same phase** — so in
+Phi = Em/(E · L_f), numerator and denominator move against each other at once.
+No improvement in the accuracy of any individual channel recovers a coupling
+that lives *between* them. Worst-case Phi reaches 2.15 against the committed
+model's 1.29. (Ledger `F-015`.)
+
+**And a falling Phi does not mean recovery.** In rung B, Phi improves from
+1.268 to 1.143 — while L_f_active is unchanged at 0.442 and C falls from 1.502
+to 1.399. The ratio got better because the system shed complexity it could no
+longer maintain. Phi cannot distinguish recovery from managed collapse, so it
+must always be reported with its decomposition. (Ledger `F-016`.)
+
+The hydropower literature contains this same lesson independently: ENSO
+production anomalies are individually significant at more than a third of dams
+and cancel to a statistically insignificant *net global* anomaly. That is the
+third time this repo has been caught by a scalar hiding structure — after
+aggregate labour hid hub destruction (`F-003`) and Phi hid the sequencing
+damage (`F-002`). Measure per locality; never as a system mean.
+
+```bash
+python3 sim/sim.py enso    # the ladder above
+```
 
 -----
 
@@ -118,6 +183,7 @@ infrastructure-stability-model/
 ├── measurement.json           <- physical metrics, early warning thresholds
 ├── decision-framework.json    <- 7 levers, decision tree, interaction matrix
 ├── METHOD.md                  <- how claims are tested, revised, and retired
+├── SOURCES.md                 <- external literature, and what was actually read of it
 ├── validate.py                <- enforces the repo's own rules (stdlib only)
 ├── sim/
 │   ├── sim.py                 <- mean-field ODE engine
@@ -209,7 +275,7 @@ Developed from working operational knowledge of rural industrial labor systems a
 
 **Structurally simulated, empirically unparameterized.**
 
-The model structure is complete and all three engines run. Not one parameter in any of them has been calibrated against field data. Three headline claims have been falsified and rewritten by the model's own simulations, one confirmed against a deliberately strengthened test, and two checks have been caught being incapable of failing and replaced — once in the partial-order test, once in a sensitivity sweep written after the first was documented (ledger `F-004`, `F-011`). Knowing about a failure mode did not prevent repeating it, which is the argument for the validator.
+The model structure was not complete: for its first five months three of five state variables had no feedback at all, which made the headline bifurcation claim unsupportable and the shock analysis inert (ledger `F-013`, `F-014`). That is fixed, with gains defaulting to zero so the difference is inspectable rather than silent. All three engines run. Not one parameter in any of them has been calibrated against field data. Six headline claims have been falsified and rewritten by the model's own simulations, two revised, one confirmed against a deliberately strengthened test, and three checks have been caught being incapable of failing — the partial-order test, a sensitivity sweep written after the first was documented, and the stochastic shock mode (ledger `F-004`, `F-011`, `F-013`). Knowing about a failure mode did not prevent repeating it, which is the argument for the validator.
 
 The open unknowns most worth attacking are listed in `legacy/ledger.json` under `open_unknowns_summary`. The largest is that the entire hub argument rests on an assumed correlation between hazard recognition capacity and trust-network degree that has never been measured in the field.
 
