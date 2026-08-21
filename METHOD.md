@@ -64,6 +64,76 @@ a hypothesis.
 
 -----
 
+## Reading someone else's result
+
+Most claims that enter this repository come from outside it. They arrive as
+headlines, abstracts, and summaries, and the failure mode is not that they are
+wrong — it is that the quantity they measured is not the quantity you care
+about. Four checks, applied before a number is allowed into a schema.
+
+**1. What is the actual subject?** A result is about one measured variable. A
+headline is usually about a category. "AMOC handles more warming than
+expected" is a statement about circulation continuity — one subsystem, one
+variable. It is not a statement about ocean systems, biosphere tolerance, or
+human consequence, and the substitution is where the reassurance comes from.
+The same ocean state can have AMOC persisting, coral past bleaching
+thresholds, upwelling suppressed, and nutrient flux blocked by stratification.
+"Handles it" is true for the modelled variable and false for nearly every
+coupled one. Write down the measured quantity and the implied quantity as two
+separate lines. If they differ, the result does not transfer.
+
+This is the same error as ledger `F-016` in a different setting: there, Phi
+fell both when labour recovered and when complexity was destroyed, and the
+scalar could not tell them apart. Here, the measured variable survives and the
+system it stands for does not.
+
+**2. Is the condition a level or a derivative?** The Utrecht AMOC result is
+that stability depends on the *rate* of CO2 change, not on a fixed temperature
+threshold — so there is no safe temperature number, and the reassuring reading
+requires slow forcing, which is not the observed condition. A threshold stated
+as a level cannot express that. This repository states its entire warning
+vocabulary as levels, and ledger `F-019` records what happened when that was
+tested here.
+
+**3. What is the baseline, and what does it absorb?** An anomaly is a
+difference from a reference period. 1991-2020, 1951-1980 and pre-industrial
+give materially different magnitudes for the same physical state, because a
+later baseline absorbs prior warming into the "normal". A smaller anomaly
+number may be a later baseline, not a smaller anomaly. Record the reference
+period alongside every ingested figure; a number without one is not usable.
+
+Adjacent: **what is "not that bad" being compared against?** Against
+worst-case projections, possibly. Against a pre-industrial baseline, possibly
+not. For a question about whether a system's regime has changed, only the
+second comparison is informative.
+
+**4. What was excluded — in depth, in space, in instrument?**
+
+- *Depth or dimension.* A surface-only measurement cannot show a subsurface
+  anomaly. If the structure in question is a decoupling between layers, a
+  single-layer measurement is not weak evidence, it is no evidence.
+- *Spatial averaging.* A regional signal is diluted by global averaging, and
+  an annular or dipole pattern can very nearly vanish in a global mean. This
+  repository has hit this three times from the inside (`F-002`, `F-003`,
+  `F-016`) and the ENSO hydropower literature contains it independently:
+  anomalies significant at more than a third of dams, approximately zero in
+  the global aggregate.
+- *Instrument transitions.* Long records are stitched from different
+  instruments, and the joins are where artefacts live. Bucket to engine-intake
+  SST introduced a known warm bias that different groups corrected
+  differently. The XBT to Argo transition changed depth coverage, spatial
+  coverage and temporal resolution simultaneously, so no single correction
+  isolates one of them. The satellite era is surface-only at a different
+  resolution from the in-situ record it continues. Before using a trend across
+  a join, check whether the stratum you care about was sampled consistently on
+  both sides of it.
+
+None of these four is a reason to dismiss a result. They are reasons to write
+down what the result is *of*, so that it is not quietly promoted into a claim
+about something larger. Record the answers in `SOURCES.md` next to the number.
+
+-----
+
 ## Verdict vocabulary
 
 Every ledger entry carries exactly one verdict:

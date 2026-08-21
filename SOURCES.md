@@ -145,6 +145,41 @@ opportunity to test predictions rather than assert them.
 
 -----
 
+## Provenance fields required for every ingested number
+
+`METHOD.md` sets out four checks for reading someone else's result. This is
+where the answers get recorded. Every number entering a schema needs these,
+and **none of the entries above currently has all of them** — that gap is
+itself a finding, and shrinking it is a roadmap item.
+
+| field | why it matters |
+|---|---|
+| `reference_period` | An anomaly is a difference from a baseline. 1991-2020, 1951-1980 and pre-industrial give materially different magnitudes for the same physical state, because a later baseline absorbs prior warming into the "normal". A smaller anomaly number may be a later baseline, not a smaller anomaly. |
+| `depth_or_dimension` | Surface-only cannot show a subsurface structure. If the phenomenon is a decoupling between layers, a single-layer measurement is not weak evidence, it is no evidence. |
+| `spatial_scope` | Regional or global mean, and if global, whether the regional signal survives the averaging. This repository has been caught by aggregation four times from the inside. |
+| `instrument_era` | Long records are stitched across joins, and the joins are where artefacts live. |
+| `compared_against` | "Not that bad" relative to worst-case projections is a different claim from "not that bad" relative to pre-industrial. For a regime-change question only the second is informative. |
+
+### Instrument joins to check before using a trend across one
+
+- **Bucket to engine-intake SST.** Introduced a known warm bias, corrected
+  differently by different groups. Trends spanning the join inherit whichever
+  correction the dataset chose.
+- **XBT to Argo.** Changed depth coverage, spatial coverage and temporal
+  resolution *simultaneously*, so no single correction isolates one of them.
+- **Satellite era onset.** Surface-only, at a different spatial resolution
+  from the in-situ record it continues, so what gets averaged changes at the
+  join.
+- **Argo depth range.** Nominally 0-2000m. A subsurface anomaly at 50-150m is
+  well inside that, but check whether *that stratum specifically* was sampled
+  consistently across the full record rather than assuming the nominal range
+  implies uniform coverage.
+
+The general rule: a change in instrument is a change in the measured
+quantity, and a trend across a join is a claim about both.
+
+-----
+
 ## How to use this file
 
 If you change a number in `system-model.json` `climate_forcing`, change the

@@ -1,9 +1,9 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "infrastructure-stability-model/v1.3/legacy-ledger",
+ "$id": "infrastructure-stability-model/v1.4/legacy-ledger",
  "title": "Falsification Ledger",
  "description": "Record of every claim in this repository that has been tested, and what the test did to it. Append-only. Entries are never edited after resolution except to add a rerun result or a follow-on entry id. See METHOD.md for the protocol and the verdict vocabulary.",
- "version": "1.3.0",
+ "version": "1.4.0",
  "license": "CC0 1.0 Universal",
  "maintained_under": "METHOD.md",
  "verdict_vocabulary": {
@@ -302,19 +302,20 @@
    "hypothesis": "The 2026 ENSO literature invalidates the shock model's independence assumptions. Three candidates: arrivals are quasi-periodic rather than Poisson, recovery takes years rather than months, and a single event drives maintenance demand, energy throughput and labor bandwidth at once. Testing which of the three carries the risk.",
    "test": "python3 sim/sim.py enso. Factor ladder, each rung changing exactly one assumption from the rung above, 60 runs per rung under the baseline policy with state feedback on. Rung A is the committed assumption set. E uses the 2-3 year period reported for extreme warming.",
    "result": "Arrival statistics barely matter and persistence alone does not raise risk. Quasi-periodic arrivals (rung C) give a 90th-percentile Phi of 0.94x the committed model; multi-year persistence alone (rung B) gives 0.96x and actually lowers median Phi. Common mode is what carries the risk: acting on Em, E and L_f in the same phase (rung D) gives 1.18x, and doing so on the extreme-warming 2.5-year period (rung E) gives 1.35x, with worst-case Phi reaching 2.15 against the committed model's 1.29. Without feedback the same ladder gives 1.00x, 1.00x, 1.29x and 1.54x, with rungs A through C showing literally zero variance (F-013).",
-   "verdict": "untested",
+   "verdict": "falsified",
    "claim_before": null,
-   "claim_after": "Within this model, ENSO changes infrastructure risk through simultaneity rather than frequency. Phi = Em/(E*L_f_active) treats its three physical terms as independently perturbed; a single ENSO event moves all three adversely in the same phase, so numerator and denominator work against each other at once. Getting each channel estimate more accurate does not recover this — the coupling is the effect. Verdict untested because every channel coefficient is an order-of-magnitude reading, not a calibration.",
+   "claim_after": "WITHDRAWN. The numbers in this entry were produced with the climate forcing wired only into the Phi readout and not into the integrator (F-018), so they measured a readout transformation over a trajectory that never felt the climate. The qualitative claim — that ENSO acts through simultaneity rather than frequency — survives the correction; the magnitudes do not. See F-020 for the resolved result.",
    "unknowns_opened": [
     "Em_surge 0.25, E_deficit 0.08 and L_deficit 0.06 are order-of-magnitude readings of the literature, not fits to any infrastructure dataset. The 1.18x and 1.35x figures scale with them",
     "The sources were read as search summaries and abstracts. Full texts were not retrievable from this environment, so the coefficients rest on secondary reporting and none of the numbers has been checked against a primary table",
     "Whether the three channels are in phase in reality or merely in the same year. The model puts them exactly in phase, which is the strongest form of the assumption",
     "Whether teleconnection correlation across regions compounds this further. The 20-40 percent shift in paired-breadbasket shock probability suggests the spatial correlation is large, and this model is single-region",
-    "Whether the shortened extreme-warming period should be paired with the reduced amplitude the same study reports. Rung E shortens the period and holds amplitude, which is the pessimistic half of a non-monotonic result"
+    "Whether the shortened extreme-warming period should be paired with the reduced amplitude the same study reports. Rung E shortens the period and holds amplitude, which is the pessimistic half of a non-monotonic result",
+    "Whether the effect is a location shift or a distributional widening — it is the latter, which this entry's p90-only reporting could not have shown"
    ],
    "artifact": null,
    "precedent_retained": "Common-mode drivers cannot be represented by improving independent channel estimates. Any future shock model in this repository must state whether its channels are independent and defend it.",
-   "rerun": null
+   "rerun": "F-018 found the defect; F-020 reran at n=250 per seed across three seeds. Corrected finding: common-mode forcing widens the distribution rather than shifting it (median 0.92x, p99 1.32x, max 1.38x)."
   },
   {
    "id": "F-016",
@@ -335,18 +336,101 @@
    "artifact": null,
    "precedent_retained": "This is the third form of the same failure in this repository. Aggregate labor hid hub destruction (F-003), Phi hid the sequencing damage (F-002), and now Phi hides the difference between recovery and capability loss. A scalar summary of a structured system hides structure by construction; the question is only which structure. The ENSO literature contains the identical lesson independently: hydropower anomalies are individually significant at more than a third of dams and cancel to approximately zero in the global aggregate.",
    "rerun": null
+  },
+  {
+   "id": "F-017",
+   "date_opened": "2026-08-21",
+   "date_resolved": "2026-08-21",
+   "subject": "Two interventions on the same parameter compose into a schedule",
+   "hypothesis": "An Intervention list can express a multi-stage schedule on one parameter — raise it at month 6, return it at month 18 — by supplying two Intervention objects for that parameter.",
+   "test": "Built exactly that two-stage schedule on Y_bias and printed the effective parameter at months 0, 6, 8, 12, 16, 18, 24 and 60.",
+   "result": "Y_bias = 1.000 at every timepoint. The pulse never happened. get_effective_params evaluated each intervention against the pristine base value and let the last one in the list win, so the second intervention overwrote the first outright — and before its own start_month it returned base_value, clobbering the active earlier intervention with the untouched baseline. A two-stage schedule on one parameter did nothing at all, silently.",
+   "verdict": "falsified",
+   "claim_before": "Interventions are time-triggered parameter changes; a list of them defines a scenario.",
+   "claim_after": "Interventions now compose by sequence: they are applied in start_month order and each ramps from whatever the previous one had reached, so list order no longer affects the result. Verified against the two-stage schedule and against list reversal.",
+   "unknowns_opened": [
+    "Whether any external fork built a multi-stage scenario and read a null result as a finding",
+    "Whether ramp-during-ramp is now correct when two interventions on one parameter overlap in time — the sequential composition assumes the earlier ramp has finished, and overlapping ramps are untested",
+    "How many silent-null defects remain in the scenario layer, given this is the fourth in this repository"
+   ],
+   "artifact": null,
+   "precedent_retained": "No committed scenario was affected — all four use distinct parameters, and the duplicates in run_stochastic_shocks are across separate config lists, not within one. The defect was latent, not active. A silent null is the characteristic failure of this codebase and the reason every new test now needs a positive control.",
+   "rerun": "Four committed scenarios rerun after the fix; Phi at 12/36/60/120 months unchanged to three decimals in all four."
+  },
+  {
+   "id": "F-018",
+   "date_opened": "2026-08-21",
+   "date_resolved": "2026-08-21",
+   "subject": "The climate forcing added in F-015 reached the dynamics",
+   "hypothesis": "ENSOForcing modifies alpha, E and L_climate_mult through get_effective_params, so the common-mode channels drive the ODE and the reported Phi reflects a system evolving under climate stress.",
+   "test": "Called ode_system directly at the same state with and without an active forcing and compared dC/dt.",
+   "result": "Identical. dC/dt = 0.05189104097881845 with and without a +1.0 Y_bias forcing. The forcing never reached the integrator. The edit that threaded the forcing argument through matched a pattern that occurred in compute_derived but not in ode_system, because ode_system has an intervening comment line, so only the readout was wired up. Every F-015 number was Phi recomputed with climate-adjusted parameters at output time, over a trajectory that had never felt the climate.",
+   "verdict": "falsified",
+   "claim_before": "Common mode raises the 90th-percentile Phi by 18 percent, and by 35 percent at the extreme-warming period; worst case 2.15 against 1.29.",
+   "claim_after": "Those figures are withdrawn. They measured a readout transformation, not a dynamical response. With the forcing actually reaching the integrator the effect is smaller, because the complexity brake now responds to the stress and partially absorbs it. The corrected and properly resolved result is in F-020.",
+   "unknowns_opened": [
+    "How much else in this session was verified by reading the diff rather than by testing the behavior — this defect was introduced and shipped inside the same turn that added a rule about constructing the failing input",
+    "Whether a string-replacement edit should ever be trusted to wire a data path without an assertion that the path is live",
+    "Whether compute_derived and ode_system should share one parameter-resolution call site so they cannot diverge again"
+   ],
+   "artifact": null,
+   "precedent_retained": "Threading an argument through a signature is not evidence that the argument is used. Any new data path in this model must be verified by perturbing the input and observing the output change, at the innermost function, before any result depending on it is reported.",
+   "rerun": "F-020, at n=250 per seed across three seeds."
+  },
+  {
+   "id": "F-019",
+   "date_opened": "2026-08-21",
+   "date_resolved": "2026-08-21",
+   "subject": "Whether this model can express a rate-dependent collapse condition",
+   "hypothesis": "The Utrecht AMOC result is that circulation stability depends on the rate of CO2 change rather than a fixed temperature threshold — the collapse condition is a derivative, not a level. This repository states its entire warning vocabulary as levels. Testing whether a rate condition is expressible here at all.",
+   "test": "python3 sim/sim.py rate. Equal-area pulses on Y_bias: amplitude times duration held constant while duration varies 12, 24, 48, 96 months, so every run delivers the same integrated dose at rates differing 8-fold and starts and ends at the same forcing level. Solver noise floor measured by rerunning one configuration against itself rather than assumed.",
+   "result": "Feedback off: spread in Phi at 120 months is 9.47e-06 against a measured noise floor of ~1e-05. No rate dependence whatsoever; the model responds only to accumulated dose. Feedback on: spread 1.31e-02, roughly 1300x the noise floor, so rate dependence is real — but the sign is inverted. The slow pulse ends worse (Phi 1.33878) than the fast one (1.32571).",
+   "verdict": "revised",
+   "claim_before": "Phi < 0.7 stable, 0.7-1.0 marginal, Phi >= 1.0 structural decay — a purely level-based warning vocabulary.",
+   "claim_after": "Without state feedback the model is a pure integrator and a rate condition is inexpressible: only the time-integral of forcing matters. With feedback there is genuine rate dependence, but it runs opposite to the AMOC case. An AMOC-type condition means fast forcing is more dangerous because it outruns a restoring flux. The only feedback here is a stabilizing brake on complexity, so slow forcing is worse — it stays below the threshold that engages the brake. Same phenomenon name, opposite sign, different mechanism. This model cannot currently represent a rate-triggered collapse.",
+   "unknowns_opened": [
+    "What a destabilizing feedback would be in infrastructure terms. The repository already believes in one — F-003's claim that hub loss makes the next campaign harder — but it lives in the agent-based model and in prose, never in the ODE",
+    "Whether every mechanism in this model that could produce a cascade is outside the ODE. If so, the ODE cannot produce the behavior the repository is named for",
+    "Whether the level thresholds should be restated as conditions on dPhi/dt, or paired with them, and what data would set the rate threshold",
+    "Whether the inverted sign is an artifact of the single feedback term chosen, or a real property of maintenance-constrained systems"
+   ],
+   "artifact": null,
+   "precedent_retained": "Before stating a threshold as a level, check whether the model can express a rate condition at all. A level vocabulary in a system whose real condition is a derivative will read as safe right up until it is not, and the reassuring reading requires slow forcing.",
+   "rerun": null
+  },
+  {
+   "id": "F-020",
+   "date_opened": "2026-08-21",
+   "date_resolved": "2026-08-21",
+   "subject": "What common-mode ENSO forcing actually does to the outcome distribution",
+   "hypothesis": "Following F-018, rerunning the common-mode ladder with the forcing genuinely driving the dynamics. Testing rung E (common mode at the 2-3 year extreme-warming period) against rung A (the committed Poisson assumption set), at a sample size large enough to resolve the effect against seed variation.",
+   "test": "n=250 per seed, three master seeds, feedback on, baseline policy. Median, 90th, 99th percentile and maximum of Phi at 120 months. An effect is called resolved only when the mean ratio differs from 1 by more than twice the seed-to-seed range.",
+   "result": "The effect is distributional, not a shift. E/A ratios, mean across seeds with range in brackets: median 0.916 [0.007], p90 1.088 [0.031], p99 1.321 [0.051], max 1.379 [0.034]. All four resolved. Common-mode forcing LOWERS the median Phi by 8 percent while raising the 99th percentile by 32 percent and the maximum by 38 percent. It widens the distribution asymmetrically rather than moving it. The median improves because sustained stress engages the stabilizing complexity brake; the tail worsens because clustered events outrun it. Separately: at n=40-60 the p90 ratio for rung D varied 1.004 to 1.194 across seeds, a range exceeding its own effect, so it was never resolved at the sample size used in F-015.",
+   "verdict": "revised",
+   "claim_before": "Common mode raises the 90th-percentile Phi by 18 percent and by 35 percent at the extreme-warming period (F-015, withdrawn in F-018).",
+   "claim_after": "Common-mode ENSO forcing widens the outcome distribution rather than shifting it: median Phi falls 8 percent, the 99th percentile rises 32 percent, the maximum rises 38 percent. The typical year gets slightly better and the bad year gets substantially worse. Any summary that reports a mean or a median describes this as a mild improvement, which is the opposite of the risk-relevant reading.",
+   "unknowns_opened": [
+    "Whether the median improvement is real or an artifact of the complexity brake being the only feedback present — it is the same stabilizing term that inverted the rate-dependence sign in F-019",
+    "What sample size resolves rung D, and whether its effect is genuinely near zero or merely small",
+    "Whether tail statistics should replace p90 as this repository's standard reporting quantity, given that the interesting behavior is at p99 and above",
+    "Whether real infrastructure exhibits the median improvement — a system that sheds capability under stress and reports an improved burden ratio is the F-016 failure mode appearing as a distributional artifact"
+   ],
+   "artifact": null,
+   "precedent_retained": "This is the fourth appearance of the same lesson in this repository: a scalar summary hides the structure that matters. Aggregate labor hid hub destruction (F-003), Phi hid the sequencing damage (F-002), Phi hid capability loss (F-016), and now the median hides the tail. Report the distribution, and state the sample size at which each figure resolves.",
+   "rerun": null
   }
  ],
  "open_unknowns_summary": {
   "description": "Unknowns from unresolved entries, and the ones most worth attacking next. Derived from the entries above; not authoritative on its own.",
   "highest_value": [
-   "Whether the model bifurcates at all now that feedback exists, and at what value (F-014) — the entire threshold vocabulary of this repository depends on an answer nobody has produced",
-   "Regeneration of every figure at nonzero feedback gain (F-014) — all committed figures predate the feedback closure",
+   "Whether every cascade-producing mechanism in this model lives outside the ODE (F-019) — if so the ODE cannot produce the behavior the repository is named for",
+   "What a destabilizing feedback is in infrastructure terms, so a rate-triggered collapse becomes expressible (F-019)",
+   "Whether the model bifurcates at all now that feedback exists, and at what value (F-014)",
+   "Regeneration of every figure at nonzero feedback gain (F-014) — all committed figures predate the closure",
    "A paired capability metric so Phi cannot be improved by destroying complexity (F-016)",
-   "Calibration of the three ENSO channel coefficients against infrastructure data, and verification against primary sources rather than search summaries (F-015)",
-   "Field measurement of trust-network topology and the R_i-to-degree correlation (F-003) — the hub argument rests entirely on it",
-   "Whether a tier-0 evidence record raises the probability of a subsequent tier-2 ask succeeding (F-012)",
-   "Multi-region ENSO teleconnection coupling (F-015) — the model is single-region and the spatial correlation is reported as large"
+   "Whether tail statistics should replace p90 as the standard reporting quantity (F-020)",
+   "Calibration of the ENSO channel coefficients, and verification against primary sources rather than search summaries (F-015)",
+   "Field measurement of trust-network topology and the R_i-to-degree correlation (F-003)"
   ]
  },
  "metadata": {

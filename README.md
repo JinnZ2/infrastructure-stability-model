@@ -89,25 +89,60 @@ defaulting to zero so every prior result reproduces exactly — and the
 threshold behaviour is still undemonstrated, merely no longer impossible.
 (Ledger `F-014`.)
 
-**What ENSO actually changes is simultaneity, not frequency.** Running a
-factor ladder where each rung alters one assumption:
+**What ENSO actually changes is simultaneity, not frequency — and it changes
+the tail, not the middle.** The first version of this section reported that
+common mode raised the 90th-percentile Phi by 18%, and 35% at the
+extreme-warming period. Those numbers are withdrawn. The forcing had been
+wired into the Phi readout but not into the integrator, so they measured a
+readout transformation over a trajectory that had never felt the climate
+(ledger `F-018`). They were also quoted at a sample size that could not
+resolve them: rung D's p90 ratio varied 1.004 to 1.194 across master seeds, a
+spread larger than its own effect.
 
-| rung | change | p90 Phi vs committed |
-|---|---|---|
-| A | Poisson, 3-month recovery, single channel | baseline |
-| B | + multi-year persistence (Callahan & Mankin, 5yr) | 0.96x |
-| C | + quasi-periodic arrivals (4yr ENSO cycle) | 0.94x |
-| D | + common mode on Em, E and L_f together | **1.18x** |
-| E | D at the 2-3yr extreme-warming period | **1.35x** |
+Rerun with the forcing genuinely driving the dynamics, at n=250 per seed
+across three seeds, extreme-warming common mode against the committed
+assumption set:
 
-Making arrivals quasi-periodic instead of Poisson does essentially nothing.
-Adding multi-year persistence on its own does nothing. What matters is that a
-single ENSO event raises maintenance demand, lowers primary energy throughput,
-and lowers effective labour bandwidth **in the same phase** — so in
-Phi = Em/(E · L_f), numerator and denominator move against each other at once.
-No improvement in the accuracy of any individual channel recovers a coupling
-that lives *between* them. Worst-case Phi reaches 2.15 against the committed
-model's 1.29. (Ledger `F-015`.)
+| statistic | ratio | seed range | resolved |
+|---|---|---|---|
+| median Phi | **0.916** | 0.007 | yes |
+| p90 | 1.088 | 0.031 | yes |
+| p99 | **1.321** | 0.051 | yes |
+| max | **1.379** | 0.034 | yes |
+
+Common-mode forcing **widens the distribution rather than shifting it**. The
+median improves 8% — sustained stress engages the stabilizing complexity brake
+— while the 99th percentile rises 32% and the maximum 38%. The typical year
+gets slightly better and the bad year gets substantially worse.
+
+Which means a summary that reports a mean or a median describes this as a mild
+improvement. That is the fourth time in this repository that a scalar has
+hidden the structure that matters, after aggregate labour hid hub destruction
+(`F-003`), Phi hid the sequencing damage (`F-002`), and Phi hid capability loss
+(`F-016`). (Ledger `F-020`.)
+
+**And the collapse condition here is a level, not a rate.** The Utrecht AMOC
+result is that circulation stability depends on the *rate* of CO2 change
+rather than any fixed temperature threshold — there is no safe number, and the
+reassuring reading requires slow forcing. Asking that of this model with
+equal-area pulses (same integrated dose, durations differing 8-fold, identical
+start and end levels): with feedback off the spread in final Phi is 9.5e-06
+against a measured noise floor of 1e-05, so there is *no* rate dependence at
+all — a pure integrator that responds only to accumulated dose. With feedback
+on there is genuine rate dependence, 1300x the noise floor, but the sign is
+inverted: the **slow** pulse ends worse, because the only feedback present is a
+stabilizing brake and slow forcing stays under the threshold that engages it.
+
+Same phenomenon name, opposite sign, different mechanism. This model cannot
+currently represent a rate-triggered collapse — that needs a feedback that
+*destabilizes* under fast forcing. The repository already believes in one:
+`F-003`'s claim that hub loss makes the next campaign harder. It lives in the
+agent-based model and in prose, and has never been in the ODE. (Ledger
+`F-019`.)
+
+```bash
+python3 sim/sim.py rate    # the equal-area pulse test
+```
 
 **And a falling Phi does not mean recovery.** In rung B, Phi improves from
 1.268 to 1.143 — while L_f_active is unchanged at 0.442 and C falls from 1.502
@@ -123,7 +158,7 @@ aggregate labour hid hub destruction (`F-003`) and Phi hid the sequencing
 damage (`F-002`). Measure per locality; never as a system mean.
 
 ```bash
-python3 sim/sim.py enso    # the ladder above
+python3 sim/sim.py enso    # the common-mode ladder
 ```
 
 -----

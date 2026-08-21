@@ -11,6 +11,7 @@ Usage:
   python3 sim/sim.py handoff        # temporal cohort handoff visualization
   python3 sim/sim.py shocks         # stochastic disruption Monte Carlo (see F-013)
   python3 sim/sim.py enso           # ENSO common-mode forcing vs the Poisson assumption
+  python3 sim/sim.py rate           # is the collapse condition a level or a rate?
   python3 sim/sim.py all            # run everything
   python3 sim/sim.py --show         # also display interactive plots (with any mode)
 
@@ -198,12 +199,22 @@ def get_effective_params(t_years, base_params, interventions, forcing=None):
     that targets B_i=0.15 sets B_i to 0.15 whatever the climate is doing; the
     climate then scales the physical terms on top of that. Reversing the order
     would let a drought undo a policy, which is not what either represents.
+
+    Two interventions on the SAME parameter compose by sequence, not by
+    overwrite: the later one ramps from whatever the earlier one had reached.
+    Before this was fixed (ledger F-017) each intervention was evaluated
+    against the pristine base value and the last one in the list won outright,
+    so a second intervention on a parameter silently erased the first — and
+    before its own start_month it returned the base value, clobbering an
+    active earlier intervention with the untouched baseline. A two-stage
+    schedule on one parameter therefore did nothing at all.
     """
     t_months = t_years * 12.0
     params = dict(base_params)
-    for iv in interventions:
-        base_val = base_params[iv.param]
-        params[iv.param] = iv.get_value(t_months, base_val)
+    for iv in sorted(interventions,
+                     key=lambda i: (i.start_month if i.start_month is not None
+                                    else float("-inf"))):
+        params[iv.param] = iv.get_value(t_months, params[iv.param])
     if forcing is not None:
         params = forcing.apply(params, t_months)
     return params
@@ -372,8 +383,8 @@ def ode_system(t, y, base_params, interventions, forcing=None):
     kappa = np.clip(kappa, STATE_DOMAINS[3, 0], STATE_DOMAINS[3, 1])
     prior_dismissal_state = np.clip(prior_dismissal_state, STATE_DOMAINS[4, 0], STATE_DOMAINS[4, 1])
 
-    # Get effective parameters (with interventions applied)
-    p = get_effective_params(t, base_params, interventions)
+    # Get effective parameters (with interventions and climate forcing applied)
+    p = get_effective_params(t, base_params, interventions, forcing)
 
     # Derived quantities
     beta_eff = p["beta0"] + p["gamma"] * kappa
@@ -1240,21 +1251,37 @@ def run_enso_comparison(save_path=None, n_runs=60, seed=7, t_months_total=120,
             "phi": phi_runs, "color": color,
             "median": float(np.median(final)),
             "p90": float(np.percentile(final, 90)),
+            "p99": float(np.percentile(final, 99)),
             "worst": float(np.max(final)),
             "frac_cascade": float(np.mean(final >= 1.0)),
             "frac_marginal": float(np.mean(final >= 0.7)),
         }
 
-    print(f"\n{'rung':<52}{'med':>7}{'p90':>7}{'max':>7}{'>=0.7':>7}{'>=1.0':>7}")
+    print(f"\n{'rung':<52}{'med':>7}{'p90':>7}{'p99':>7}{'max':>7}{'>=1.0':>7}")
     print("-" * 87)
     for label, r in results.items():
-        print(f"{label:<52}{r['median']:>7.3f}{r['p90']:>7.3f}{r['worst']:>7.3f}"
-              f"{r['frac_marginal']:>7.0%}{r['frac_cascade']:>7.0%}")
+        print(f"{label:<52}{r['median']:>7.3f}{r['p90']:>7.3f}{r['p99']:>7.3f}"
+              f"{r['worst']:>7.3f}{r['frac_cascade']:>7.0%}")
 
     base = results[ladder[0][0]]
+    print(f"\n  ratio to the committed model (rung A):")
+    print(f"  {'rung':<6}{'median':>9}{'p90':>9}{'p99':>9}{'max':>9}")
     for label, r in list(results.items())[1:]:
-        ratio = r["p90"] / base["p90"] if base["p90"] else float("nan")
-        print(f"  {label[:3]} p90 is {ratio:.2f}x the committed model's")
+        print(f"  {label[:2]:<6}"
+              + "".join(f"{r[k] / base[k]:>9.3f}" if base[k] else f"{'nan':>9}"
+                        for k in ("median", "p90", "p99", "worst")))
+
+    print(f"""
+  Read the whole distribution. Common-mode forcing does not shift Phi, it
+  WIDENS it: the median improves because the stabilizing complexity brake
+  engages under sustained stress, while the upper tail gets substantially
+  worse. Reporting the median or the mean would describe this as a mild
+  improvement. See ledger F-020.
+
+  At n={n_runs} the p90 ratios are NOT resolved against seed-to-seed variation --
+  rung D's spread across master seeds exceeds its effect. The resolved figures
+  in F-020 come from n=250 per seed across three seeds. Do not quote a ratio
+  from a single run of this function as a result.""")
 
     _plot_enso(results, save_path)
     return results
@@ -1305,6 +1332,150 @@ def _plot_enso(results, save_path):
     return fig
 
 
+# ===========================================================================
+# EXTENSION 5: is the collapse condition a level or a rate?
+# ===========================================================================
+
+@dataclass
+class PulseForcing:
+    """
+    A rectangular excess on one parameter: amplitude `amp` for `dur` months
+    starting at `start`. Start and end levels are identical by construction,
+    so any difference in outcome is attributable to the excursion alone.
+
+    Used to discriminate rate dependence from integrated-dose dependence.
+    Pulses with equal amp*dur deliver the same integrated forcing at
+    different rates. A pure integrator cannot tell them apart.
+    """
+    param: str = "Y_bias"
+    amp: float = 1.0
+    dur: float = 12.0
+    start: float = 6.0
+
+    @property
+    def area(self):
+        return self.amp * self.dur
+
+    def apply(self, params, t_months):
+        if self.start <= t_months < self.start + self.dur:
+            out = dict(params)
+            out[self.param] = params[self.param] + self.amp
+            return out
+        return params
+
+    def state_perturbation(self, t_months):
+        """No direct state channel. Present so the interface matches ENSOForcing."""
+        return 0.0, 1.0
+
+
+def run_rate_vs_level(save_path=None, area=12.0, t_months_total=120):
+    """
+    The AMOC question asked of this model: is the collapse condition a level
+    or a derivative?
+
+    The Utrecht AMOC result is that circulation stability depends on the RATE
+    of CO2 change rather than on any fixed temperature threshold — the
+    collapse condition is a derivative, not a level. This repository states
+    its entire warning vocabulary as levels (Phi < 0.7, 0.7-1.0, >= 1.0), so
+    it is worth knowing whether this model can express a rate condition at all.
+
+    Method: equal-area pulses. Every run starts and ends at the same forcing
+    level and delivers the same integrated dose, spread over durations
+    differing by 8x. A model that responds only to accumulated dose gives
+    identical outcomes; a model with genuine rate dependence does not.
+
+    The solver noise floor is measured, not assumed, by comparing the same
+    configuration against itself at different tolerances — a spread below it
+    is not evidence of rate dependence.
+    """
+    save_path = save_path or _fig("rate_vs_level.png")
+    print(f"\n=== Rate vs Level (equal-area pulses, area = {area}) ===")
+
+    durations = [12.0, 24.0, 48.0, 96.0]
+    settings = [("feedback OFF (legacy)", PARAMS),
+                ("feedback ON", FEEDBACK_PARAMS)]
+
+    results = {}
+    for label, prm in settings:
+        rows = []
+        for dur in durations:
+            forcing = PulseForcing(amp=area / dur, dur=dur)
+            r = run_scenario(f"{label} d={dur}", [], t_months=t_months_total,
+                             params=dict(prm), forcing=forcing)
+            rows.append({
+                "dur": dur, "amp": forcing.amp,
+                "C": float(r["state"]["C"][-1]),
+                "kappa": float(r["state"]["kappa"][-1]),
+                "Phi": float(r["derived"]["Phi"][-1]),
+                "t": r["t_months"], "phi_series": r["derived"]["Phi"],
+            })
+        results[label] = rows
+
+    # Measure the noise floor rather than assuming it: same configuration,
+    # tighter solver tolerance. Spread below this is numerical, not physical.
+    ref = PulseForcing(amp=area / 24.0, dur=24.0)
+    loose = run_scenario("nf", [], t_months=t_months_total,
+                         params=dict(FEEDBACK_PARAMS), forcing=ref)
+    noise_floor = abs(float(loose["derived"]["Phi"][-1]) - float(
+        run_scenario("nf2", [], t_months=t_months_total,
+                     params=dict(FEEDBACK_PARAMS), forcing=ref
+                     )["derived"]["Phi"][-1]))
+    noise_floor = max(noise_floor, 1e-5)
+
+    print(f"\n{'setting':<22}{'dur(mo)':>9}{'amp':>8}{'C@end':>10}"
+          f"{'kappa@end':>11}{'Phi@end':>10}")
+    print("-" * 70)
+    for label, rows in results.items():
+        for r in rows:
+            print(f"{label:<22}{r['dur']:>9.0f}{r['amp']:>8.3f}"
+                  f"{r['C']:>10.5f}{r['kappa']:>11.5f}{r['Phi']:>10.5f}")
+
+    print(f"\nsolver noise floor on Phi: ~{noise_floor:.1e}")
+    for label, rows in results.items():
+        phis = [r["Phi"] for r in rows]
+        spread = max(phis) - min(phis)
+        verdict = ("RATE-DEPENDENT" if spread > 10 * noise_floor
+                   else "no rate dependence (integrated dose only)")
+        direction = ""
+        if spread > 10 * noise_floor:
+            slow_worse = phis[-1] > phis[0]
+            direction = ("; the SLOW pulse ends worse" if slow_worse
+                         else "; the FAST pulse ends worse")
+        print(f"  {label:<22} spread {spread:.2e}  -> {verdict}{direction}")
+
+    print("""
+  Read the sign, not just the magnitude. An AMOC-type rate condition means
+  fast forcing is more dangerous, because it outruns a restoring flux. The
+  only feedback in this model is a stabilizing brake on complexity, so slow
+  forcing is worse here: it stays under the threshold that engages the brake.
+  Same phenomenon name, opposite sign, different mechanism. This model cannot
+  currently represent a rate-triggered collapse — that needs a feedback that
+  destabilizes under fast forcing, which nothing in the ODE provides.
+  See ledger F-019.""")
+
+    _plot_rate(results, noise_floor, save_path)
+    return results
+
+
+def _plot_rate(results, noise_floor, save_path):
+    fig, axes = plt.subplots(1, 2, figsize=(15, 5.5))
+    for ax, (label, rows) in zip(axes, results.items()):
+        for r in rows:
+            ax.plot(r["t"], r["phi_series"], linewidth=1.8,
+                    label=f"{r['dur']:.0f}mo x {r['amp']:.3f}")
+        ax.axhline(1.0, color="#d62728", linestyle="--", linewidth=1)
+        ax.axhline(0.7, color="#ff7f0e", linestyle=":", linewidth=1)
+        phis = [r["Phi"] for r in rows]
+        spread = max(phis) - min(phis)
+        ax.set_title(f"{label}\nequal-area pulses, Phi spread {spread:.1e} "
+                     f"(noise floor {noise_floor:.0e})", fontsize=10)
+        ax.set_xlabel("Months"); ax.set_ylabel("Phi")
+        ax.legend(fontsize=8, title="duration x amplitude"); ax.grid(True, alpha=0.3)
+    fig.savefig(save_path, dpi=110, bbox_inches="tight")
+    print(f"Saved: {save_path}")
+    return fig
+
+
 def run_core_scenarios(show=False):
     """Run the original 4-scenario comparison."""
     scenarios = make_scenarios()
@@ -1349,11 +1520,13 @@ def main():
         run_stochastic_shocks()
     if mode in ("enso", "all"):
         run_enso_comparison(policy="baseline")
+    if mode in ("rate", "all"):
+        run_rate_vs_level()
 
-    if mode not in ("core", "sweep", "handoff", "shocks", "enso", "all"):
+    if mode not in ("core", "sweep", "handoff", "shocks", "enso", "rate", "all"):
         print(f"Unknown mode: {mode}")
         print("Usage: python3 sim/sim.py "
-              "[core|sweep|handoff|shocks|enso|all] [--show]")
+              "[core|sweep|handoff|shocks|enso|rate|all] [--show]")
         sys.exit(1)
 
     if show:

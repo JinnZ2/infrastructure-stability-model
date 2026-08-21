@@ -1,9 +1,9 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "infrastructure-stability-model/v1.3/index",
+ "$id": "infrastructure-stability-model/v1.4/index",
  "title": "Infrastructure Stability Model — Schema Repository Index",
  "description": "Machine-readable formalization of a thermodynamic infrastructure stability framework. Covers energy-material-labor network dynamics, latent node detection and activation, and intervention sequencing for 3-5 year critical window. Includes runnable simulation engines and a falsification ledger recording which claims have been tested and what the tests did to them.",
- "version": "1.3.0",
+ "version": "1.4.0",
  "license": "CC0 1.0 Universal",
  "authors": [
   "Kavik",
@@ -90,12 +90,15 @@
     "superseded_wording": "Bifurcation at Phi=1.0. System drawing down reserves above the threshold; failure synchronization probability rises sharply."
    },
    {
-    "insight": "ENSO changes infrastructure risk through simultaneity, not frequency. Phi treats Em, E and L_f_active as independently perturbed; one ENSO event moves all three adversely in the same phase. Making the shock quasi-periodic instead of Poisson changes the 90th-percentile Phi by -6 percent; making it common-mode raises it 18 percent, and 35 percent at the 2-3 year period reported for extreme warming.",
-    "evidence_status": "untested",
+    "insight": "ENSO acts through simultaneity rather than frequency, and it widens the outcome distribution rather than shifting it. Common mode at the extreme-warming period against the committed assumption set: median Phi 0.916x, p90 1.088x, p99 1.321x, max 1.379x, all resolved at n=250 per seed across three seeds. The typical year improves slightly because the stabilizing complexity brake engages; the bad year gets substantially worse.",
+    "evidence_status": "revised",
     "ledger_entries": [
-     "F-015"
+     "F-015",
+     "F-018",
+     "F-020"
     ],
-    "note": "Channel coefficients are order-of-magnitude readings of the literature, taken from abstracts and summaries rather than full texts. No calibration against infrastructure data."
+    "note": "Any summary reporting a mean or median describes this as a mild improvement, which is the opposite of the risk-relevant reading. Report the tail.",
+    "superseded_wording": "Common mode raises the 90th-percentile Phi by 18 percent and by 35 percent at the extreme-warming period. Withdrawn: the forcing reached only the readout, not the integrator, and the sample size could not resolve the ratio."
    },
    {
     "insight": "A falling Phi does not mean recovery. Under sustained stress the maintenance-burden feedback sheds complexity the system can no longer maintain and the ratio improves because the numerator shrank — Phi falls from 1.268 to 1.143 with L_f_active unchanged and C down from 1.502 to 1.399. Recovery and managed collapse are indistinguishable in the scalar.",
@@ -104,6 +107,14 @@
      "F-016"
     ],
     "superseded_wording": "Phi < 0.7 stable surplus. Lower is better."
+   },
+   {
+    "insight": "The collapse condition in this model is a level, not a rate. Equal-area pulses differing 8-fold in rate give identical outcomes with feedback off (spread 9.5e-06 against a 1e-05 noise floor) — a pure integrator. With feedback on there is real rate dependence but with inverted sign: the slow pulse ends worse, because the only feedback is a stabilizing brake that slow forcing evades. An AMOC-type rate-triggered collapse is not expressible here.",
+    "evidence_status": "revised",
+    "ledger_entries": [
+     "F-019"
+    ],
+    "note": "Every mechanism in this repository that could produce a cascade — notably F-003's hub depletion — lives in the agent-based model or in prose, never in the ODE."
    }
   ]
  },
@@ -153,7 +164,7 @@
    "ode_engine": {
     "path": "sim/sim.py",
     "description": "Mean-field ODE integration of the 5-variable coupled system. Four intervention scenarios, parameter sensitivity sweeps, temporal cohort handoff, stochastic shock Monte Carlo. Includes an ENSO common-mode factor ladder and an optional state-feedback closure (FEEDBACK_PARAMS, gains zero by default so prior results reproduce exactly).",
-    "invocation": "python3 sim/sim.py [core|sweep|handoff|shocks|enso|all] [--show]",
+    "invocation": "python3 sim/sim.py [core|sweep|handoff|shocks|enso|rate|all] [--show]",
     "requires": [
      "numpy",
      "scipy",
@@ -204,6 +215,11 @@
    "item": "bifurcation_sweep: does the model exhibit threshold behavior now that state feedback exists",
    "status": "pending",
    "rationale": "Ledger F-014. The entire threshold vocabulary of this model — cascade, synchronization, critical value 1.0 — depends on an answer nobody has produced. The gains were chosen for plausibility, not to produce a threshold."
+  },
+  {
+   "item": "destabilizing_feedback_in_the_ODE: port F-003 hub depletion into the mean-field model",
+   "status": "pending",
+   "rationale": "Ledger F-019. Without a feedback that destabilizes under fast forcing, the ODE cannot produce a rate-triggered collapse or a cascade of any kind — the behavior the repository is named for is currently outside its core model."
   },
   {
    "item": "regenerate_all_figures_at_nonzero_feedback_gain",
