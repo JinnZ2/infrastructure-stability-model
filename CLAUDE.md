@@ -108,3 +108,17 @@ Each core JSON schema follows this structure:
 - Signal obstruction (B_i) must be reduced before activation outreach **in the same locality** — the constraint is local, not global (ledger `F-004`). Do not restate it as an aggregate-labor or Phi claim; it is topological (ledger `F-002`, `F-003`).
 - Figures are output, not source. Regenerate them rather than editing; do not archive old ones.
 - Reference Tainter, West, and complex systems cascade theory where applicable.
+
+<!-- clone-refspec-note v1 -->
+## Cloning and pushing
+Shallow clones are single-branch by default.
+Before pushing any branch other than main, run:
+
+    git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+    git fetch --depth 1
+
+Or clone with: git clone --depth 1 --no-single-branch <url>
+Without this, the first push of a new branch
+fails the tracking-ref check even when the
+commit landed.
+<!-- /clone-refspec-note v1 -->
