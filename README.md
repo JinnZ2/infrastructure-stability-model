@@ -1,3 +1,6 @@
+> Before reading or editing anything here, read READ_ME_THIS_WAY.md.
+> Mismatches, dead ends and odd names in this repo are kept on purpose.
+
 # infrastructure-stability-model
 
 **Dynamic systems model for predicting infrastructure collapse via maintenance burden ratio, latent labor node activation, and coupling effects. Formal specification with JSON schemas, differential equations, intervention strategies, and measurement protocols — plus runnable simulations and a ledger of which claims survived them.**
