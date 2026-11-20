@@ -20,7 +20,7 @@ Usage:
 
 Plots are written to figures/ at the repository root.
 
-Authors: Kavik, Claude (Anthropic)
+Authors: JinnZ2, Claude (Anthropic)
 License: CC0 1.0 Universal
 """
 

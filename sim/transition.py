@@ -50,7 +50,7 @@ Usage:
 
 Stdlib only. No dependencies.
 
-Authors: Kavik, Claude (Anthropic)
+Authors: JinnZ2, Claude (Anthropic)
 License: CC0 1.0 Universal
 """
 

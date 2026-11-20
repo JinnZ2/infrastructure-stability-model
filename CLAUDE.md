@@ -6,7 +6,7 @@ Infrastructure Stability Model — a theoretical systems model for predicting in
 
 It is a specification layer (JSON schemas) plus two runnable simulation engines, a set of standalone diagnostic modules, and a falsification ledger recording which claims have survived being tested.
 
-**Authors:** Kavik, Claude (Anthropic)
+**Authors:** JinnZ2, Claude (Anthropic)
 **License:** CC0 1.0 Universal (public domain)
 **Status:** Structurally simulated, empirically unparameterized. No parameter has been calibrated against field data.
 
